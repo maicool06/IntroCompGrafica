@@ -13,8 +13,10 @@ class pushPopMatriz:
     def load( obj, texture):
         glPushMatrix()
 
-        glTranslatef(-30,0,-45) # Traslacion. (derecha, arriba, hacia adentro).
-        glRotatef(-70, 1,0,0)   # Rotacion. (angulo, eje x, eje y, eje z).
+   
+        glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+        glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
         #glRotatef(230, 0,0,1)
 
         glVertexPointer(3, GL_FLOAT, 0, obj.vertFaces)         
