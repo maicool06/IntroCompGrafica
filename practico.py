@@ -8,6 +8,8 @@ from OpenGL.GL.shaders import *
 
 from obj import *
 from events_obj import *
+from texture import *
+from pushPopMatriz import *
 
 def main():
 
@@ -16,8 +18,8 @@ def main():
     # Instrucciones para levantar ventana grafica
     
     pygame.init()
-    cw = 800
-    ch = 600
+    cw = 1024
+    ch = 720
     display = (cw,ch)
     pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
     pygame.display.set_caption('Game Of Life')
@@ -37,9 +39,9 @@ def main():
     list_hueteotl_weapon_jump = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_jump_")  
 
 
-    hueteotl = list_hueteotl[0]
+    obj_hueteotl = list_hueteotl[0]
 
-    hueteotl_weapon = list_hueteotl_weapon[0]
+    obj_hueteotl_weapon = list_hueteotl_weapon[0]
 
 
     #---------------------------------------------------------------------------------------
@@ -49,11 +51,9 @@ def main():
     glEnable(GL_TEXTURE_2D)                         
     glActiveTexture(GL_TEXTURE0)       
 
-    # Funcion que levanta la textura a memoria de video            
-
-    text1 = loadTexture("./Animaciones/hueteotl_animado/hueteotl.png")
-
-    text2 = loadTexture("./Animaciones/weapon_hueteotl_animada/weapon.png")
+    # Cargar texturas.
+    
+    textura = texture()
 
     #---------------------------------------------------------------------------------------
     
@@ -83,7 +83,7 @@ def main():
 
     glEnable(GL_DEPTH_TEST)                         # Comparaciones de profundidad y actualizar el bufer de profundidad.
 
-    glClearColor(0,0.6667,0,8941)               # Color de fondo.
+    glClearColor(0.1,0.6,0.8,0.5)               # Color de fondo.
 
     
     #---------------------------------------------------------------------------------------
@@ -105,14 +105,11 @@ def main():
 
     eventos.startTimeEvents(1)
 
-
     #---------------------------------------------------------------------------------------
 
     
     c_hueteotl = 0
-    c_hueteotl_weapon = 0
     c_hueteotl_jump = 0
-    c_hueteotl_weapon_jump = 0
             
 
     while True:
@@ -167,31 +164,27 @@ def main():
                         glFrontFace(GL_CCW)
 
             if event.type == eventos.hueteotl:
-                hueteotl = list_hueteotl[c_hueteotl]
-                hueteotl_weapon = list_hueteotl_weapon[c_hueteotl_weapon]
+                obj_hueteotl = list_hueteotl[c_hueteotl]
+                obj_hueteotl_weapon = list_hueteotl_weapon[c_hueteotl]
 
                 if c_hueteotl >= ( len(list_hueteotl) - 1 ):
                     c_hueteotl = 0
-                    c_hueteotl_weapon = 0
-            
+                
                 else:
                     c_hueteotl += 1
-                    c_hueteotl_weapon += 1
-            
+                
             if event.type == eventos.hueteotl_jump:
-                hueteotl = list_hueteotl_jump[c_hueteotl_jump]
-                hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_weapon_jump]
+                obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
+                obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
 
                 if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
                     c_hueteotl_jump = 0
-                    c_hueteotl_weapon_jump = 0
                     eventos.startTimeEvents(1)
                     eventos.stopTimeEvents(2)
             
                 else:
                     c_hueteotl_jump += 1
-                    c_hueteotl_weapon_jump += 1
-
+                
 
     #---------------------------------------------------------------------------------------
     
@@ -208,42 +201,9 @@ def main():
 
     #---------------------------------------------------------------------------------------
 
-        glPushMatrix()
+        pushPopMatriz.load(obj_hueteotl , textura.hueteotl)
 
-
-        glTranslatef(-30,0,-60) # Traslacion. (derecha, arriba, hacia adentro).
-        glRotatef(-90, 1,0,0)   # Rotacion. (angulo, eje x, eje y, eje z).
-        #glRotatef(230, 0,0,1)
-        
-
-        glVertexPointer(3, GL_FLOAT, 0, hueteotl.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, hueteotl.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, hueteotl.texturesFaces)    
-
-        glBindTexture(GL_TEXTURE_2D, text1)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(hueteotl.vertFaces)*3)     
-
-        glPopMatrix()
-        
-
-    #---------------------------------------------------------------------------------------
-
-        glPushMatrix()
-
-        glTranslatef(-30,0,-60) # Traslacion. (derecha, arriba, hacia adentro).
-        glRotatef(-90, 1,0,0)   # Rotacion. (angulo, eje x, eje y, eje z).
-       
-        #glRotatef(243, 0,0,1)
-        
-
-        glVertexPointer(3, GL_FLOAT, 0, hueteotl_weapon.vertFaces)          
-        glNormalPointer(GL_FLOAT, 0, hueteotl_weapon.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, hueteotl_weapon.texturesFaces)    
-
-        glBindTexture(GL_TEXTURE_2D, text2)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(hueteotl_weapon.vertFaces)*3)     
-
-        glPopMatrix()
+        pushPopMatriz.load(obj_hueteotl_weapon , textura.hueteotl_weapon)
 
     #---------------------------------------------------------------------------------------
     
@@ -260,25 +220,5 @@ def main():
     glDeleteTextures([text])
     pygame.quit()
     quit()
-
-def loadTexture(path):
-
-    surf = pygame.image.load(path)                  # Cargo imagen en memoria
-    surf = pygame.transform.flip(surf, False, True) # Espejo la imagen
-
-    image = pygame.image.tostring(surf, 'RGBA', 1)  # Obtengo la matriz de colores de la imagen.
-    
-    ix, iy = surf.get_rect().size       # Obentego las dimensiones de la imagen
-    texid = glGenTextures(1)            # Textura vacia en memoria de video
-    glBindTexture(GL_TEXTURE_2D, texid) # Activo textura
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-  
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
-    
-    glBindTexture(GL_TEXTURE_2D, 0)
-    
-    return texid
 
 main()  
