@@ -28,12 +28,20 @@ def main():
 
     # Cargar archivos .obj.
 
-    list_hueteotl = obj().objLoad(39,"./Animaciones/hueteotl_animado/","hueteotl_stand_")  
+    list_hueteotl = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_run_")  
+    
+    list_hueteotl_weapon = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_run_")  
+
+    list_hueteotl_jump = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_jump_")  
+    
+    list_hueteotl_weapon_jump = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_jump_")  
+
+
     hueteotl = list_hueteotl[0]
 
-    list_hueteotl_weapon = obj().objLoad(39,"./Animaciones/weapon_hueteotl_animada/","weapon_stand_")  
     hueteotl_weapon = list_hueteotl_weapon[0]
-    
+
+
     #---------------------------------------------------------------------------------------
 
     # Activo las texturas ( 8 disponibles).
@@ -75,14 +83,14 @@ def main():
 
     glEnable(GL_DEPTH_TEST)                         # Comparaciones de profundidad y actualizar el bufer de profundidad.
 
-    glClearColor(0,1,1,1)               # Color de fondo.
+    glClearColor(0,0.6667,0,8941)               # Color de fondo.
 
     
     #---------------------------------------------------------------------------------------
 
     # Variables
-    ang = 0.0
-    vel = 0.0
+    ang = 20
+    vel = 1
 
     mode = GL_FILL
     zBuffer = True
@@ -95,7 +103,7 @@ def main():
     
     eventos = events_obj()
 
-    eventos.setTimeEvents()
+    eventos.startTimeEvents(1)
 
 
     #---------------------------------------------------------------------------------------
@@ -103,17 +111,22 @@ def main():
     
     c_hueteotl = 0
     c_hueteotl_weapon = 0
+    c_hueteotl_jump = 0
+    c_hueteotl_weapon_jump = 0
+            
 
     while True:
         for event in pygame.event.get():        
             if event.type == pygame.QUIT:       
                 pygame.quit()
                 quit()
-        
-            
             
             if event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
+                if event.key == pygame.K_w:
+                    eventos.stopTimeEvents(1)
+                    eventos.startTimeEvents(2)
+                    
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
@@ -155,19 +168,30 @@ def main():
 
             if event.type == eventos.hueteotl:
                 hueteotl = list_hueteotl[c_hueteotl]
+                hueteotl_weapon = list_hueteotl_weapon[c_hueteotl_weapon]
 
                 if c_hueteotl >= ( len(list_hueteotl) - 1 ):
                     c_hueteotl = 0
+                    c_hueteotl_weapon = 0
+            
                 else:
                     c_hueteotl += 1
-            
-            if event.type == eventos.hueteotl_weapon:
-                hueteotl_weapon = list_hueteotl_weapon[c_hueteotl_weapon]
-
-                if c_hueteotl_weapon >= ( len(list_hueteotl_weapon) - 1 ):
-                    c_hueteotl_weapon = 0
-                else:
                     c_hueteotl_weapon += 1
+            
+            if event.type == eventos.hueteotl_jump:
+                hueteotl = list_hueteotl_jump[c_hueteotl_jump]
+                hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_weapon_jump]
+
+                if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
+                    c_hueteotl_jump = 0
+                    c_hueteotl_weapon_jump = 0
+                    eventos.startTimeEvents(1)
+                    eventos.stopTimeEvents(2)
+            
+                else:
+                    c_hueteotl_jump += 1
+                    c_hueteotl_weapon_jump += 1
+
 
     #---------------------------------------------------------------------------------------
     
@@ -189,8 +213,6 @@ def main():
 
         glTranslatef(-30,0,-60) # Traslacion. (derecha, arriba, hacia adentro).
         glRotatef(-90, 1,0,0)   # Rotacion. (angulo, eje x, eje y, eje z).
-
-        
         #glRotatef(230, 0,0,1)
         
 
