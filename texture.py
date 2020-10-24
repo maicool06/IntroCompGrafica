@@ -10,15 +10,16 @@ class texture:
     
     hueteotl = None
     hueteotl_weapon = None
-    box = None
+    box_1 = None
+    box_2 = None
 
     def __init__(self):
         
         # Levanta las texturas a memoria de video            
         self.hueteotl = self.__loadTexture("./Animaciones/hueteotl_animado/hueteotl.png")
         self.hueteotl_weapon = self.__loadTexture("./Animaciones/weapon_hueteotl_animada/weapon.png")
-        self.box = self.__loadTexture("./Animaciones/box/box.jpg")
-
+        self.box_1 = self.__loadTexture("./Animaciones/box/box.jpg")
+        self.box_2 = self.__loadTexture("./Animaciones/box/box.jpg")
 
     def __loadTexture(self,path):
 

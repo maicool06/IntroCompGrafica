@@ -2,45 +2,63 @@ import pygame
 
 class events_obj():
     def __init__(self):
-        self.hueteotl = pygame.USEREVENT + 1
-        self.hueteotl_weapon = pygame.USEREVENT + 2
-        self.hueteotl_jump = pygame.USEREVENT + 3
-        self.hueteotl_jump_weapon = pygame.USEREVENT + 4
-        
-        self.velocidad_caminar = 500
-        self.velocidad_correr = 500
-        
+        self.hueteotl_run = pygame.USEREVENT + 0
+        self.hueteotl_jump = pygame.USEREVENT + 1
+        self.hueteotl_crouch = pygame.USEREVENT + 2
+        self.hueteotl_stand = pygame.USEREVENT + 3
+        self.box_1 = pygame.USEREVENT + 4
+
+        self.v_hueteotl_run = 500
+        self.v_hueteotl_jump = 500
+        self.v_hueteotl_crouch = 500
+        self.v_hueteotl_stand = 500
+        self.v_box_1 = 200 
 
     def startTimeEvents(self, element):
 
-        if element == 1:
-            pygame.time.set_timer(self.hueteotl, self.velocidad_caminar)
-            pygame.time.set_timer(self.hueteotl_weapon, self.velocidad_caminar)
+        if element == "run":
+            pygame.time.set_timer(self.hueteotl_run, self.v_hueteotl_run)
             return
-            
-        if element == 2:
-            pygame.time.set_timer(self.hueteotl_jump, self.velocidad_correr)
-            pygame.time.set_timer(self.hueteotl_jump_weapon, self.velocidad_correr)
+        if element == "jump":
+            pygame.time.set_timer(self.hueteotl_jump, self.v_hueteotl_jump)
             return
-
+        if element == "crouch":
+            pygame.time.set_timer(self.hueteotl_crouch, self.v_hueteotl_crouch)
+            return
+        if element == "stand":
+            pygame.time.set_timer(self.hueteotl_stand, self.v_hueteotl_stand)
+            return
+        if element == "box_1":
+            pygame.time.set_timer(self.box_1, self.v_box_1)
+            return
         else:
             print("Default Start")
 
     def stopTimeEvents(self, element):
-
-        if element == 1:
-            pygame.time.set_timer(self.hueteotl, 0)
-            pygame.time.set_timer(self.hueteotl_weapon, 0)
+        if element == "run":
+            pygame.time.set_timer(self.hueteotl_run, 0)
             return
-            
-        if element == 2:
+        if element == "jump":
             pygame.time.set_timer(self.hueteotl_jump, 0)
-            pygame.time.set_timer(self.hueteotl_jump_weapon, 0)
             return
-        
-        else:
-            print("Default Stop")
+        if element == "crouch":
+            pygame.time.set_timer(self.hueteotl_crouch, 0)
+            return
+        if element == "stand":
+            pygame.time.set_timer(self.hueteotl_stand, 0)
+            return
+        if element == "box_1":
+            pygame.time.set_timer(self.box_1, self.v_box_1)
+            return
 
+        if element == "all":                                #Solo los del Hueteotl
+            pygame.time.set_timer(self.hueteotl_run, 0)
+            pygame.time.set_timer(self.hueteotl_jump, 0)
+            pygame.time.set_timer(self.hueteotl_crouch, 0)
+            pygame.time.set_timer(self.hueteotl_stand, 0)
+            return
+        else:
+            print("Default Stop")  
         
         
        

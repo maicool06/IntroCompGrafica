@@ -6,10 +6,11 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GL.shaders import *
 
+
 from obj import *
 from events_obj import *
 from texture import *
-from pushPopMatriz import *
+
 
 def main():
 
@@ -18,10 +19,11 @@ def main():
     # Instrucciones para levantar ventana grafica
     
     pygame.init()
-    cw = 1024
-    ch = 720
-    display = (cw,ch)
-    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
+    width = 1024
+    height = 720
+    display = (width,height)
+    
+    window = pygame.display.set_mode(display, DOUBLEBUF|OPENGL|OPENGLBLIT)
     pygame.display.set_caption('Game Of Life')
 
 
@@ -30,23 +32,21 @@ def main():
 
     # Cargar archivos .obj.
 
-    list_hueteotl = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_run_")  
-    
-    list_hueteotl_weapon = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_run_")  
+    list_hueteotl_run = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_run_")    
+    list_hueteotl_weapon_run = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_run_")  
 
     list_hueteotl_jump = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_jump_")  
-    
     list_hueteotl_weapon_jump = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_jump_")  
 
+    list_hueteotl_crouch = obj().objLoad(5,"./Animaciones/hueteotl_animado/","hueteotl_crouch_walk_")  
+    list_hueteotl_weapon_crouch = obj().objLoad(5,"./Animaciones/weapon_hueteotl_animada/","weapon_crouch_walk_")  
 
-    obj_hueteotl = list_hueteotl[0]
+    list_hueteotl_stand= obj().objLoad(39,"./Animaciones/hueteotl_animado/","hueteotl_stand_")  
+    list_hueteotl_weapon_stand = obj().objLoad(39,"./Animaciones/weapon_hueteotl_animada/","weapon_stand_")
 
-    obj_hueteotl_weapon = list_hueteotl_weapon[0]
 
     list_box = obj().objLoad(0,"./Animaciones/box/","box_")  
-
-    obj_box = list_box[0]
-
+   
     #---------------------------------------------------------------------------------------
 
     # Activo las texturas ( 8 disponibles).
@@ -81,7 +81,7 @@ def main():
 
     glMatrixMode(GL_PROJECTION)          # Activo el stack de matrices para la proyeccion.
     glLoadIdentity()                     # Cargo una identidad para asegurarme que comience vacio.
-    glViewport(0,0,cw,ch)            # Crea la matriz de escala, transforma de unidades arbitrarias a pixels.
+    glViewport(0,0,width,height)            # Crea la matriz de escala, transforma de unidades arbitrarias a pixels.
     glFrustum(-1, 1, -1, 1, 1, 1000)     # Crea la matriz de Proyeccion. volumen de vista.
 
     glEnable(GL_DEPTH_TEST)                         # Comparaciones de profundidad y actualizar el bufer de profundidad.
@@ -94,6 +94,8 @@ def main():
     # Variables
     ang = 20
     vel = 1
+    pos_box_1 = 15
+    pos_box_2 = 30
 
     mode = GL_FILL
     zBuffer = True
@@ -104,29 +106,99 @@ def main():
 
     #---------------------------------------------------------------------------------------
     
+
+    #Inicializar cosas de cositas para cosotes    
+    
+    obj_hueteotl = list_hueteotl_stand[0]
+
+    obj_hueteotl_weapon = list_hueteotl_weapon_stand[0]
+
+    obj_box = list_box[0]
+
     eventos = events_obj()
 
-    eventos.startTimeEvents(1)
+    eventos.startTimeEvents("stand")    
+    
 
     #---------------------------------------------------------------------------------------
 
     
-    c_hueteotl = 0
+    c_hueteotl_run = 0
     c_hueteotl_jump = 0
-            
+    c_hueteotl_crouch = 0
+    c_hueteotl_stand = 0 
 
     while True:
         for event in pygame.event.get():        
-            if event.type == pygame.QUIT:       
-                pygame.quit()
-                quit()
-            
+
+            if event.type >= pygame.USEREVENT and event.type <= pygame.USEREVENT + 4:     # Evento Obj 
+
+                if event.type == eventos.hueteotl_run:
+                    obj_hueteotl = list_hueteotl_run[c_hueteotl_run]
+                    obj_hueteotl_weapon = list_hueteotl_weapon_run[c_hueteotl_run]
+
+                    if c_hueteotl_run >= ( len(list_hueteotl_run) - 1 ):
+                        c_hueteotl_run = 0
+                    
+                    else:
+                        c_hueteotl_run += 1
+
+                if event.type == eventos.hueteotl_jump:
+                    obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
+                    obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
+
+                    if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
+                        c_hueteotl_jump = 0
+                        eventos.stopTimeEvents("all")
+                        eventos.startTimeEvents("run")                    
+                    else:
+                        c_hueteotl_jump += 1
+
+                if event.type == eventos.hueteotl_crouch:
+                    obj_hueteotl = list_hueteotl_crouch[c_hueteotl_crouch]
+                    obj_hueteotl_weapon = list_hueteotl_weapon_crouch[c_hueteotl_crouch]
+
+                    if c_hueteotl_crouch >= ( len(list_hueteotl_crouch) - 1 ):
+                        c_hueteotl_crouch = 0
+                        eventos.stopTimeEvents("all")
+                        eventos.startTimeEvents("run")                    
+                    else:
+                        c_hueteotl_crouch += 1
+
+                if event.type == eventos.hueteotl_stand:
+                    obj_hueteotl = list_hueteotl_stand[c_hueteotl_stand]
+                    obj_hueteotl_weapon = list_hueteotl_weapon_stand[c_hueteotl_stand]
+
+                    if c_hueteotl_stand >= ( len(list_hueteotl_stand) - 1 ):
+                        c_hueteotl_stand = 0
+                    else:
+                        c_hueteotl_stand += 1
+
+                if event.type == eventos.box_1:
+                    pos_box_1 -= 1
+                    pos_box_2 -= 1
+
+                    if pos_box_1 <= -15:
+                        pos_box_1 = 15
+                    if pos_box_2 <= -15:
+                        pos_box_2 = 15
+                    
+
             if event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
-                if event.key == pygame.K_w:
-                    eventos.stopTimeEvents(1)
-                    eventos.startTimeEvents(2)
-                    
+                if event.key == pygame.K_w:             # Saltar
+                    eventos.stopTimeEvents("all")
+                    eventos.startTimeEvents("jump")
+
+                if event.key == pygame.K_s:             # Agacharse
+                    eventos.stopTimeEvents("all")
+                    eventos.startTimeEvents("crouch")
+
+                if event.key == pygame.K_d:             # Start
+                    eventos.stopTimeEvents("all")
+                    eventos.startTimeEvents("run")
+                    eventos.startTimeEvents("box_1")    
+
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
@@ -166,28 +238,9 @@ def main():
                     else:
                         glFrontFace(GL_CCW)
 
-            if event.type == eventos.hueteotl:
-                obj_hueteotl = list_hueteotl[c_hueteotl]
-                obj_hueteotl_weapon = list_hueteotl_weapon[c_hueteotl]
-
-                if c_hueteotl >= ( len(list_hueteotl) - 1 ):
-                    c_hueteotl = 0
-                
-                else:
-                    c_hueteotl += 1
-                
-            if event.type == eventos.hueteotl_jump:
-                obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
-                obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
-
-                if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
-                    c_hueteotl_jump = 0
-                    eventos.startTimeEvents(1)
-                    eventos.stopTimeEvents(2)
-            
-                else:
-                    c_hueteotl_jump += 1
-                
+            if event.type == pygame.QUIT:       
+                pygame.quit()
+                quit()
 
     #---------------------------------------------------------------------------------------
     
@@ -204,11 +257,11 @@ def main():
 
     #---------------------------------------------------------------------------------------
 
-        #  BOX
+        #  BOX 1
 
         glPushMatrix()
    
-        glTranslatef(-10, 0, -15)  # Traslacion. (derecha, arriba, profundida).
+        glTranslatef(pos_box_1, -5, -15)  # Traslacion. (derecha, arriba, profundida).
         glScalef(0.5,0.5,0.5)
       
         glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
@@ -221,7 +274,33 @@ def main():
         glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
         glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
 
-        glBindTexture(GL_TEXTURE_2D, textura.box)                  
+        glBindTexture(GL_TEXTURE_2D, textura.box_1)                  
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+
+        glPopMatrix()
+
+   #---------------------------------------------------------------------------------------
+
+    #---------------------------------------------------------------------------------------
+
+        #  BOX 2
+
+        glPushMatrix()
+   
+        glTranslatef(pos_box_2, 5, -15)  # Traslacion. (derecha, arriba, profundida).
+        glScalef(0.5,0.5,0.5)
+      
+        glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+    
+        #glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
+        #glRotatef(230, 0,0,1)
+
+        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+
+        glBindTexture(GL_TEXTURE_2D, textura.box_2)                  
         glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
 
         glPopMatrix()
@@ -233,7 +312,8 @@ def main():
         glPushMatrix()
    
         glTranslatef(0, 0, -2)  # Traslacion. (derecha, arriba, profundida).
-        glScalef(0.02,0.02,0.02)
+        #glScalef(0.02,0.02,0.02)
+        glScalef(0.03,0.03,0.03)
         
         #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
         
