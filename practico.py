@@ -43,6 +43,9 @@ def main():
 
     obj_hueteotl_weapon = list_hueteotl_weapon[0]
 
+    list_box = obj().objLoad(0,"./Animaciones/box/","box_")  
+
+    obj_box = list_box[0]
 
     #---------------------------------------------------------------------------------------
 
@@ -201,9 +204,80 @@ def main():
 
     #---------------------------------------------------------------------------------------
 
-        pushPopMatriz.load(obj_hueteotl , textura.hueteotl)
+        #  BOX
 
-        pushPopMatriz.load(obj_hueteotl_weapon , textura.hueteotl_weapon)
+        glPushMatrix()
+   
+        glTranslatef(-10, 0, -15)  # Traslacion. (derecha, arriba, profundida).
+        glScalef(0.5,0.5,0.5)
+      
+        glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+    
+        #glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
+        #glRotatef(230, 0,0,1)
+
+        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+
+        glBindTexture(GL_TEXTURE_2D, textura.box)                  
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+
+        glPopMatrix()
+
+   #---------------------------------------------------------------------------------------
+
+        #   HUETEOTL
+
+        glPushMatrix()
+   
+        glTranslatef(0, 0, -2)  # Traslacion. (derecha, arriba, profundida).
+        glScalef(0.02,0.02,0.02)
+        
+        #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+        
+        #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+    
+        glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
+        #glRotatef(230, 0,0,1)
+
+        glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_hueteotl.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl.texturesFaces)
+
+        glBindTexture(GL_TEXTURE_2D, textura.hueteotl)                  
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl.vertFaces)*3)     
+
+        glPopMatrix()
+
+    #---------------------------------------------------------------------------------------
+ 
+        #   HUETEOTL WEAPON
+
+        glPushMatrix()
+   
+        glTranslatef(0, 0, -2)  # Traslacion. (derecha, arriba, profundida).
+        glScalef(0.02,0.02,0.02)
+        
+        #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+        
+        #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+    
+        glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
+        #glRotatef(230, 0,0,1)
+
+        glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl_weapon.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_hueteotl_weapon.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl_weapon.texturesFaces)
+
+        glBindTexture(GL_TEXTURE_2D, textura.hueteotl_weapon)                  
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl_weapon.vertFaces)*3)     
+
+        glPopMatrix()
+    
 
     #---------------------------------------------------------------------------------------
     
@@ -217,7 +291,7 @@ def main():
         
         pygame.display.flip()       # Hago flip de los buffers, para que se refresque la imagen en pantalla
 
-    glDeleteTextures([text])
+    #glDeleteTextures([text])
     pygame.quit()
     quit()
 

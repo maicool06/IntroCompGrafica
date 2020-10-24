@@ -10,11 +10,15 @@ from OpenGL.GL.shaders import *
 class pushPopMatriz:
 
     @staticmethod
-    def load( obj, texture):
+    def load( obj, texture,t_eje_x,t_eje_y,t_profundida):
         glPushMatrix()
-
    
-        glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+        glTranslatef(t_eje_x,t_eje_y,t_profundida)  # Traslacion. (derecha, arriba, profundida).
+        #glScalef(0.5,0.5,0.5)
+        
+        #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+        #glRotatef(0, 0,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+    
         glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
 
         #glRotatef(230, 0,0,1)
