@@ -1,0 +1,135 @@
+.search_filter {*top:44px;} /*IE7*/
+.search_filter {top:44px\0/;} /* IE8, IE9 */
+.search_filter {
+	position:absolute;
+	z-index:1000;
+	top:46px;
+	left:198px;
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) { .search_filter {top:44px;} } /*chrome,safari*/
+.share{
+	border-radius: 3px 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 2px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 2px 2px rgba(0, 0, 0, 0.1);
+	border:1px solid #c5c5c5;
+	padding:3px;
+	position:absolute;
+	background:#ffffff;
+	margin:-6px 0 0 -6px;
+	z-index:1;
+}
+/*Mosaic thumbnail style*/
+.imgidContainer {position:absolute;top:5px;margin-left:5px;background:#ffffff;color:#000000;padding:5px;opacity:0.5;font-size:10px;display:none;}
+.imgIconsContainer {position: absolute;margin-left:4px;height: 35px;background: #ffffff;opacity: 0.9;text-align: center;display:none;}
+.imgIconsInner {width:100px;text-align:center;margin:0 auto;}
+
+.prefSrch{
+    border-radius: 3px 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 2px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 2px 2px rgba(0, 0, 0, 0.1);
+    border:1px solid #c5c5c5;
+    padding:10px;
+    position:absolute;
+    right:1px;
+    top:30px;
+    background:#ffffff;
+    margin:-6px 0 0 -6px;
+    z-index:1;
+    width:170px;
+}
+.profile_top{
+	padding:15px 10px 0 20px;
+}
+
+.contributor_icon{
+	border:1px solid #e5e5e5;
+}
+.contributorNameContainer{
+	line-height:48px;
+	margin-left:10px;
+}
+.contributorName{
+	font-size: 20px;
+	font-weight: normal;
+	padding: 0px;
+	margin: 0px;
+}
+.contributorFollow{
+	cursor:pointer;
+	border-bottom:1px dotted #666666;
+	color:#666666;
+}
+.contributorLeftPanel{
+	padding:15px 10px 0 20px;
+	width:250px;
+	position:absolute;
+	left:0;
+}
+.contributorInfo{
+	background:#efefef;
+	position:relative;
+	padding:10px;
+}
+.contributorInfoRow{
+	margin-top:5px;
+}
+.contributorInfoRow2{
+	margin-top:10px;
+}
+.profileInterview{
+	margin:10px 0 0 0;
+	height:25px;
+}
+.profileInterviewLink{
+	cursor:pointer;
+	border-bottom:1px dotted #666666;
+	color:#666666;
+}
+.shareContainer{
+	margin:10px 0 0 0;
+	height:30px;
+}
+.shareIcon{
+	vertical-align:middle;
+	margin-right:2px
+}
+.shareText{
+	cursor:pointer;
+	color:#333333;
+	border-bottom:1px dotted #333333;
+}
+.shareArrow{
+	margin:2px 0 0 2px;
+	cursor:pointer;
+}
+.sharePopup{
+	border-bottom:1px dotted #c5c5c5;
+	background:#e5e5e5;
+	padding:2px 3px 0 2px;
+}
+.sharePopupIcon{
+	vertical-align:middle;
+	margin-right:2px
+}
+.shareTextColor{
+	color:#333333;
+}
+.shareSocialPadding{
+	padding:8px;
+}
+.shareSocialPadding a:link{
+	text-decoration:none;
+	border:0px;
+}
+.shareSocialIcon{
+	vertical-align:middle;
+	margin-right:2px;
+	width:16px;
+}
+.shareBorder{
+	border-bottom:1px solid #e6e6e6;
+}
+.searchProfileContainer{
+	background:#efefef;
+	position:relative;
+	padding:10px;
+	margin-top:20px;
+}

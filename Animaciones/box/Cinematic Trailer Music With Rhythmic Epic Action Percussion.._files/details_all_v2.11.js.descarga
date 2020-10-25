@@ -1,0 +1,425 @@
+function openPreview(url){
+	$("details_preview_overlay_comp").style.display = "block";
+	setTimeout(function(){
+		$("details_preview_overlay_comp").style.opacity = 0.6;
+	},100);
+	$("details_preview_basket").style.display = "block";
+
+	if(preview_loaded){
+		showPreview();
+	}else{
+		var elem = document.createElement("img");
+		elem.setAttribute("src", imgcacheserver+"/images/loading1.gif");
+		$("details_preview_basket_loading").appendChild(elem);
+		
+		var elem = document.createElement("img");
+		elem.setAttribute("src", url);
+		elem.setAttribute("id", "details_preview_basket_img");
+		$("details_preview_basket_img_wrapper").appendChild(elem);
+		preview_loaded = 1;
+
+		$("details_preview_basket_img").observe('click', function() {
+			closePreview();
+		});
+		$("details_preview_basket_img").onload = function(){
+			showPreview();
+		};
+	}
+}
+
+function showPreview(){
+	var preview_height = document.documentElement.clientHeight * preview_screen_percentage;
+	preview_height = ((preview_height>preview_max_size)?preview_max_size:preview_height);
+	var preview_width = getWidthForHeight(preview_height);
+	if(preview_width > (document.documentElement.clientWidth * preview_screen_percentage)){
+		preview_width = document.documentElement.clientWidth * preview_screen_percentage;
+		preview_height = getHeightForWidth(preview_width);
+	}
+	preview_width = Math.floor(preview_width);
+	preview_height = Math.floor(preview_height);
+	var previewImage_width = preview_width - preview_padding;
+	var previewImage_height = preview_height - preview_padding;
+
+	$("details_preview_basket").style.width = Math.max(preview_width,0)+"px";
+	$("details_preview_basket").style.height = Math.max(preview_height,0)+"px";
+	$("details_preview_basket_img_wrapper").width = previewImage_width;
+	$("details_preview_basket_img_wrapper").height = previewImage_height;
+	$("details_preview_basket_img").width = previewImage_width;
+	$("details_preview_basket_img").height = previewImage_height;
+	$("details_preview_basket").style.borderRadius = 0;
+
+	setTimeout(function(){
+		$("details_preview_basket_loading").style.display = "none";
+		$("details_preview_basket_img_wrapper").style.display = "block";
+		$("details_preview_exit_comp").style.display = "block";
+		setTimeout(function(){
+			$("details_preview_basket_img_wrapper").style.opacity = 1;
+		},0);
+	},300);
+}
+
+function closePreview(){
+	$("details_preview_basket").style.display = "none";
+	$("details_preview_overlay_comp").style.opacity = 0;
+	setTimeout(function(){
+		$("details_preview_overlay_comp").style.display = "none";
+	},300);
+}
+
+function getWidthForHeight(height){
+	return height * ((image_true_width) / (image_true_height));
+}
+
+function getHeightForWidth(width){
+	return width * ((image_true_height) / (image_true_width));
+}
+
+function proceedDownload(mode, url){
+	if((mode==0 || mode==1 || mode==2 || mode==3 || mode==4 || mode==9 || mode==10) && $("downloadlinknew").href.indexOf("/editor/?")>0){
+		window.location = $("downloadlinknew").href;
+		return 0;
+	}
+
+	if(mode == "footage"){
+		var producttype = "Footage";
+	}else if(mode == "audio"){
+		var producttype = "Audio";
+	}else if(mode == 1){
+		var producttype = "Vector";
+	}else{
+		var producttype = "Photo";
+	}
+
+	if(dllink_ready){
+		console.log('===ready to download===');
+		if(mode=="footage" || mode=="audio"){
+			var dllink = url;
+		}else{
+			var dllink = $("downloadlinknew").href;
+		}
+
+		dllink = dllink.replace("https:", "");
+		dllink = dllink.replace("http:", "");
+		dllink_tmp = dllink.toLowerCase();
+		
+		if(dllink_tmp.search("enlargement")>0 || dllink_tmp.search("isfreemode")>0 || old_dl_mode){
+			top.location.href = dllink + '&dltrackid=' + final_string;
+		}else{
+			$("details_download_basket_loading").style.display = "block";
+			$("details_download_overlay_comp").style.display = "block";
+			setTimeout(function(){
+				$("details_download_exit_comp").style.display = "block";
+				$("details_download_overlay_comp").style.opacity = 0.6;
+			},100);
+
+			$("details_download_basket").style.display = "block";
+
+			dllink = dllink + "&overlay=1&dltrackid=" + final_string;
+
+
+			new Ajax.Request(dllink,
+			{
+				method:'get',
+				requestHeaders:
+				{
+					Accept: 'application/json'
+				},
+				parameters:
+				{},
+				onSuccess: function(response)
+				{
+					//set BC cookie
+					var d = new Date();
+					d.setFullYear(d.getFullYear()+10);
+					document.cookie = "bc=1;domain=.123rf.com;path=/;expires="+d+";";
+					
+					var data = response.responseText.evalJSON();
+
+					if(data.redirect){
+						top.location.href = data.redirect;
+					}else{
+						$("details_download_basket_content_wrapper").style.display = "block";
+						$("details_download_basket_loading").style.display = "none";
+
+						//force the attribution box to display by default
+						// if(attributionBox < 1){
+						// 	toggleAttributionBox();
+						// }
+						
+						document.getElementById("dlbox-title").innerHTML = downloadpopup_text[data.title];
+						document.getElementById("dlbox-main-contentbox-imageid").innerHTML = data.item;
+
+						switch(data.licenseType){
+							case "standardAudio":
+								document.getElementById("license-agreement-audio-link").href = "license.php#audio";
+								break;
+							case "extendedAudio":
+								document.getElementById("license-agreement-audio-link").href = "license.php#audio_extend";
+								break;
+						}
+						
+						if(data.status == "1"){
+							finaldllink = data.dlurl;
+							var remaining_text_final = "";
+							if(data.remaining_text != ""){
+								remaining_text_final = downloadpopup_text[data.remaining_text];
+								data.remaining_value = ((data.remaining_value!="" && data.remaining_value!=null && data.remaining_value>0)?data.remaining_value:"0");
+								remaining_text_final = remaining_text_final.replace("CONST_VAL", data.remaining_value);
+							}
+							
+							if(data.res == "TIFF" || data.res == "Print Only Extended License" || data.res == "Electronic Only Extended License" || data.res == "Comprehensive Extended License" || mode=="footage" || mode=="audio")
+							{
+								document.getElementById("dlbox-main-contentbox").innerHTML = downloadpopup_text["LANG_EXT_MSG6"]+" <a href=\"#\" onclick=\"downloadFile();return false;\">"+downloadpopup_text["LANG_CLICKHERE"]+"</a><br><br>"+remaining_text_final;
+							}
+							else
+							{
+
+								document.getElementById("dlbox-main-contentbox").innerHTML = downloadpopup_text["LANG_EXT_MSG6_NEW"];
+								
+								//10 sec delay to show the alternative link
+								setTimeout(function(){
+									var newDiv = document.createElement('div');
+									newDiv.id = 'dlbox-main-contentbox-regionddl';
+									document.getElementById('dlbox-main-contentbox').appendChild(newDiv);
+								
+									document.getElementById("dlbox-main-contentbox-regionddl").innerHTML = 
+									"<div style='background:#eeeeee;padding:5px 10px 8px;margin-top:10px;line-height:23px;'>"+downloadpopup_text["LANG_EXT_MSG6_CONT"]+"<br><select name=\"locdropdown\" id=\"locdropdown\" onchange=\"downloadFile2(this.value);\"><option value=\"\" selected>["+downloadpopup_text["LANG_EXT_SELECTMIRROR"]+"]</option></select></div><br><br>";
+								
+
+								var locationhtml = downloadpopup_text["LANG_DL_LOCATION"];
+								var locvalue = downloadpopup_text["LANG_DL_LOCATION_VALUE"];
+								var sel = document.getElementById('locdropdown');
+
+								
+								for(var i = 0; i < locvalue.length; i++) {
+						            var lochtml = locationhtml[i];
+						            var opt = document.createElement('option');
+						            opt.textContent = lochtml;
+						            opt.value = locvalue[i];
+						            sel.appendChild(opt);
+							        }
+								finaldllink = data.dlurl;},10000);
+							}
+
+							window.location = data.dlurl;
+
+							//////// tfcp ////////
+							if('tfcp_enabled' in data && 'tfcp' in data) {
+								// prep data
+								var params = {};
+								params[data.tfcp.pid_name] = data.tfcp.pid;
+								// fire call
+								jQuery.ajax({
+									url: data.tfcp.url,
+									method: 'POST',
+									data: params,
+								}).done(function(response) {
+									if(data.tfcp.debug_mode === true) {
+										response = JSON.parse(response);
+										console.log('----------------------------------------------------------------------------------------------------');
+										for(var key in response) {
+											if(response.hasOwnProperty(key)) {
+												console.log(key.toUpperCase() + ': ' + (typeof response[key] === 'object' ? JSON.stringify(response[key]) : response[key]));
+											}
+										}
+										console.log('----------------------------------------------------------------------------------------------------');
+									}
+								});
+							}
+							//////// tfcp ////////
+							
+							if(data.mode=="credits")
+							{
+								if(data.item)
+								{
+									img_data = data.item;
+									regex_bracket = /\((.*)\)/;
+									img_res_gtm = img_data.match(regex_bracket)[1];
+								}
+								else if (data.licenseType)
+								{
+									img_res_gtm = data.licenseType
+								}
+								dataLayer.push({
+								'language': js_lang,
+								'type': data.dlType,
+								'category': ' ',
+								'img_resolution': img_res_gtm,
+								'credits_used': data.creditcost,
+								'remaining_credits_audio': data.remaining_value,
+								'event': 'DownloadSuccess'
+								});
+							}
+						}else{
+							document.getElementById("dlbox-main-contentbox").innerHTML = ((data.msg)?data.msg+"<br>":"") + downloadpopup_text["LANG_ERRORCONTACT"];
+							finaldllink = "";
+						}
+					}
+				}
+			});
+		}
+	}
+}
+var dllink_ready;
+var finaldllink;
+function downloadFile(){
+	if(finaldllink){
+		window.location = finaldllink;
+	}
+}
+
+function downloadFile2(){
+	var location = document.getElementById("locdropdown");
+	var mirrorlocation = location.options[location.selectedIndex].value;
+	var spliturl = finaldllink.split("/");
+
+	if(mirrorlocation != "")
+	{
+		//replace currently location with mirror location
+		spliturl[2] = mirrorlocation;
+
+		//merge back the download link
+		var new_finaldllink = spliturl.join("/");
+		if(new_finaldllink){
+			window.location = new_finaldllink;
+		}
+	}
+	
+}
+
+function closeDownloadBasket(){
+	$("details_download_basket").style.display = "none";
+	$("details_download_basket_content_wrapper").style.display = "none";
+	$("details_download_overlay_comp").style.opacity = 0;
+	setTimeout(function(){
+		$("details_download_overlay_comp").style.display = "none";
+	},300);
+}
+
+var attributionBox = 0;
+function toggleAttributionBox(){
+	if(attributionBox){
+		$("details_download_attribution_content").style.display = "none";
+		$("dlbox_arrow").className = "dlbox_arrow";
+		$("details_download_basket").style.height = "290px";
+		attributionBox = 0;
+	}else{
+		$("details_download_attribution_content").style.display = "block";
+		$("dlbox_arrow").className = "dlbox_arrow_rotate";
+		$("details_download_basket").style.height = "400px";
+		var referrallink_text = $("referrallink").value;
+		referrallink_text = referrallink_text.replace("profile_'", "profile_"+image_contributor+"'");
+		referrallink_text = referrallink_text.replace("CONTRINAME", image_contributor);
+		$("referrallink").value = referrallink_text;
+		attributionBox = 1;
+	}
+}
+
+function prepareDownloadLink(){
+	if($("details_preview_basket") && image_true_width && image_true_height && $("compImg_link") && $("details_preview_overlay_comp") && $("details_preview_exit_comp")){
+		$("compImg_link").observe('click', function(e) {
+			e.preventDefault();
+			openPreview($("compImg_link").getAttribute("href"));
+		});
+		$("details_preview_overlay_comp").observe('click', function() {
+			closePreview();
+		});
+		$("details_preview_exit_comp").observe('click', function() {
+			closePreview();
+		});
+	}
+	dllink_ready = 1;
+	if($("details_download_basket") && $("details_download_overlay_comp") && $("details_download_exit_comp") && $("details_download_attribution_bar")){
+		$("details_download_overlay_comp").observe('click', function() {
+			closeDownloadBasket();
+		});
+		$("details_download_exit_comp").observe('click', function() {
+			closeDownloadBasket();
+		});
+		$("details_download_attribution_bar").observe('click', function() {
+			toggleAttributionBox();
+		});
+	}
+}
+
+function addLoadEvent(func) {
+  var oldonload = window.onload;
+  if (typeof window.onload != 'function') {
+    window.onload = func;
+  } else {
+    window.onload = function() {
+      if (oldonload) {
+        oldonload();
+      }
+      func();
+    }
+  }
+}
+
+addLoadEvent(prepareDownloadLink);
+
+function displaySignformPopup(itemType){
+	var pathname = window.location.pathname;
+	pathname = pathname.substring(1);
+	console.log(pathname);
+	jQuery.ajax({
+		url: '/ajax_update_session.php',
+		type: 'post',
+		data : {
+			updateSession : 'previous_page',
+			newSessionValue : pathname
+		},
+		success: function(data){
+			data = JSON.parse(data);
+			if(data.status){
+				var cboxMemberTimeout = 21000,
+			        cboxMemberLoading = 0,
+			        cboxMemberTimer;
+			    var licensetab = jQuery('.srchtab2010_header_selected').first().attr('data-licensetab');
+			    var licenseSelect = '';
+			    if(itemType == 'image'){
+				    licenseSelect = jQuery('input[type=radio][name=size]:checked').closest('div.highlight').attr('id');
+			    } else if (itemType == 'footage'){
+			    	licenseSelect = jQuery('input[type=radio][name=radio_type]:checked').closest('div.highlight').attr('id');
+			    } else if (itemType == 'audio'){
+			    	licenseSelect = jQuery('input[type=radio][name=radio_type]:checked').closest('div.highlight').attr('id');
+			    }
+				jQuery.colorbox({
+			        iframe:true,
+			        innerWidth:550,
+			        innerHeight:signform_height,
+			        fastIframe:false,
+			        scrolling: false,
+			        href:site_https+"/member_iframe.php?signform=signup&intent=download&licensetab="+licensetab+"&select="+licenseSelect,
+			        onOpen:function(){
+			        	jQuery('html').css({
+			        		'overflow': 'hidden',
+			        		'height' : '100%',
+			        		'position' : 'fixed',
+			        		'width' : '100%'
+			        	});		        	
+
+			            cboxMemberLoading = 1;
+			            cboxMemberTimer = setTimeout(function(){
+			                if(cboxMemberLoading){
+			                    window.location = site_https+"/register.php";
+			                }
+			            }, cboxMemberTimeout);
+			        },
+			        onClosed: function(){
+			        	jQuery('html').css({
+			        		'overflow': '',
+			        		'height' : '',
+			        		'position' : '',
+			        		'width' : ''
+			        	});
+			        },
+			        onComplete: function(){
+			            cboxMemberLoading = 0;
+			            clearTimeout(cboxMemberTimer);
+			        }
+			    });
+			}
+		}
+	});
+}

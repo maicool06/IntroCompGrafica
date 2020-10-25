@@ -1,0 +1,227 @@
+
+function popupnr(mylink, windowname, refocus)
+{
+  var mywin, href;
+
+  if (typeof(mylink) == 'string')
+      href=mylink;
+  else
+      href=mylink.href;
+  
+  mywin = window.open(href, windowname, 'width=450,height=600,scrollbars=yes');
+
+  return false;
+}
+
+function downloading() {
+  if (document.getElementById("downloadlink1") != null) document.getElementById("downloadlink1").innerHTML = "Downloading...";
+  if (document.getElementById("downloadlink2") != null) document.getElementById("downloadlink2").innerHTML = "Downloading...";
+  if (document.getElementById("downloadlink3") != null) document.getElementById("downloadlink3").innerHTML = "Downloading...";
+  if (document.getElementById("downloadlink4") != null) document.getElementById("downloadlink4").innerHTML = "Downloading...";
+  if (document.getElementById("downloadlink5") != null) document.getElementById("downloadlink5").innerHTML = "Downloading...";
+  if (document.getElementById("downloadlink6") != null) document.getElementById("downloadlink6").innerHTML = "Downloading...";
+}
+
+
+//*** BEGIN LICENSES TAB LOADER ***
+var loading1 = function(container)
+{
+  document.getElementById(container).innerHTML = "<div style='padding:20px 40px;'>Loading..</div>";
+}
+
+var showlicensetab = function(filename,sect,lang,raw)
+{
+
+  if(sect == "standard_tab_2010"){
+      showtab = "standard";
+  }
+  else if(sect == "extended_tab_2010"){
+      showtab = "extended";
+  }
+  else if(sect == "multiseat_tab_2010"){
+      showtab = "multiseat";
+  }
+  var nowtime =  new  Date();
+  var secondsnow = nowtime.getSeconds();
+  // use second to avoid script beeing cache when refresh. IE problem.
+  var url = "details_licensetab_audio_ajax.php";
+
+  var params = "action=showtab&file_name="+filename+"&showtab="+showtab+"&nocache="+secondsnow+"&lang="+lang+"&raw="+raw;
+
+  var ajax = jQuery.ajax({
+    type: "GET",
+    url: url,
+    data: params,
+    beforeSend:function(){
+      loading1("p_imagescontainer");
+    },
+    success   : function(result) {
+      jQuery('#p_imagescontainer').empty();
+      jQuery('#p_imagescontainer').html(result);    
+    }
+  });
+}
+
+var switchtab = function(sect)
+{
+	
+  if(sect=="standard_tab")
+  {
+  	 document.getElementById('standard_tab1').className	='srchtab2009_header_selected';
+  	 document.getElementById('extended_tab1').className	='srchtab2009_header';
+  	 document.getElementById('multiseat_tab1').className ='srchtab2009_header';
+  }
+  else if(sect=="extended_tab")
+  {
+  	 document.getElementById('standard_tab1').className	='srchtab2009_header';
+  	 document.getElementById('extended_tab1').className	='srchtab2009_header_selected';
+  	 document.getElementById('multiseat_tab1').className ='srchtab2009_header';
+  }
+  else if(sect=="multiseat_tab")
+  {
+  	 document.getElementById('standard_tab1').className	='srchtab2009_header';
+  	 document.getElementById('extended_tab1').className	='srchtab2009_header';
+  	 document.getElementById('multiseat_tab1').className ='srchtab2009_header_selected';
+  }
+ 
+  document.getElementById(sect).style.background = '#FFFFFF';
+  document.getElementById(sect).style.borderBottom = '0px';
+  
+  showlicensetab(js_filename,sect,js_lang);
+}
+
+var toggleraw = function()
+{
+	alert(document.getElementById('.Raw').style.display);
+}
+
+var switchtab_2010 = function(sect, fn, raw)
+{
+
+  if(sect=="standard_tab_2010")
+  {
+  	 document.getElementById('standard_tab1_2010').className	='srchtab2010_header_selected';
+  	 document.getElementById('extended_tab1_2010').className	='srchtab2010_header';
+  	 
+  }
+  else if(sect=="extended_tab_2010")
+  {
+  	 document.getElementById('extended_tab1_2010').className	='srchtab2010_header_selected';
+  	 document.getElementById('standard_tab1_2010').className	='srchtab2010_header';
+  }
+  else if(sect=="multiseat_tab_2010")
+  {
+  	 document.getElementById('standard_tab1_2010').className	='srchtab2010_header';
+  }
+ 
+  document.getElementById(sect).style.background = '#FFFFFF';
+  document.getElementById(sect).style.borderBottom = '0px';
+  
+  showlicensetab(js_filename,sect,js_lang,raw);
+
+  if(sect=="extended_tab_2010") // GTM tracking
+  {
+    useExtendedLicenseGTM();
+  }
+}
+
+var buttonover = function(butt)
+{
+  document.getElementById(butt).style.background = '#555555';
+}
+
+var buttonout = function(butt)
+{
+  document.getElementById(butt).style.background = '#ffffff';
+}
+
+var favephotog = function(userid)
+{
+  var ajax = jQuery.ajax({
+    type: "GET",
+    url: 'details_licensetab_audio_ajax.php',
+    data: {
+      action: 'addfave',
+      pid: userid
+    },
+    dataType: 'json',
+    success   : function(result) {
+      var json = result.responseText.evalJSON(true);
+      
+      if(json.stat == 'ok')
+      {
+        document.getElementById('addfave').update('Faved');
+        document.getElementById('addfave').onclick = '';
+      } 
+    }
+  });
+}
+//*** END LICENSES TAB LOADER ***
+
+// GTM tracking
+jQuery(document).on('ready', function(e){
+  jQuery(document).on("click", ".add-to-likebox.track", function(){
+    var imgId = jQuery(this).attr('data-imgid');
+    likeboxNetCoreGTM(imgId);
+  });
+
+  jQuery(document).on("click", ".advanced-search-audio-container .track", function(){
+    var advSearchOption = jQuery(this).attr('search-option');
+    useAdvanceSearchGTM(advSearchOption);
+  });
+
+  jQuery(document).on("click", ".top-left-player .add-to-likebox", function(){
+    likeboxGTM();
+  });
+
+  if(gtmVar.keywords !== ""){
+    tagKeywordsGTM();
+  }
+
+});
+
+//Function For GTM Tracking
+function likeboxNetCoreGTM(img_id)
+{
+    dataLayer.push({
+        "event": "img_add_likebox",
+        "img_id": img_id,
+        "typeCode": gtmVar.typeCodeDetails
+    });
+}
+
+function useAdvanceSearchGTM(adv_seacrh_option) {
+  dataLayer.push({
+      "event": "use_advance_search",
+      "adv_search_option": adv_seacrh_option,
+      "typeCode": gtmVar.typeCodeDetails,
+  });
+}
+
+function useExtendedLicenseGTM() {
+	dataLayer.push({
+	  "event": "use_extended_license",
+		"img_id": gtmVar.imageId,
+		"typeCode": gtmVar.typeCodeDetails,
+	  "status": "Yes",
+	});
+}
+
+function likeboxGTM(){
+	 dataLayer.push({
+	    "event": "img_add_likebox",
+	    "img_id": gtmVar.imageId,
+	    "img_owner_id": gtmVar.supplierName,
+	    "img_type": gtmVar.filetype,
+	    "typeCodeDetails": gtmVar.typeCodeDetails
+	});
+}
+
+
+function tagKeywordsGTM(){
+	dataLayer.push({
+		"event": "use_tag_keywords",
+		"img_id": gtmVar.imageId,
+		"typeCode": gtmVar.typeCodeDetails,
+	});
+}

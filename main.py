@@ -10,6 +10,7 @@ from OpenGL.GL.shaders import *
 from obj import *
 from events_obj import *
 from texture import *
+from sound import *
 
 
 def main():
@@ -59,6 +60,12 @@ def main():
     textura = texture()
 
     #---------------------------------------------------------------------------------------
+
+    # Cargar musica.
+    
+    sonido = sound()
+
+    #---------------------------------------------------------------------------------------
     
     #glShadeModel(GL_SMOOTH) # El pipeline estatico use Gouraud Shading (sombreado suave).
 
@@ -106,7 +113,7 @@ def main():
 
     #---------------------------------------------------------------------------------------
     
-
+   
     #Inicializar cosas de cositas para cosotes    
     
     obj_hueteotl = list_hueteotl_stand[0]
@@ -118,7 +125,7 @@ def main():
     eventos = events_obj()
 
     eventos.startTimeEvents("stand")    
-    
+    sonido.startSount("stand")
 
     #---------------------------------------------------------------------------------------
 
@@ -136,10 +143,9 @@ def main():
                 if event.type == eventos.hueteotl_run:
                     obj_hueteotl = list_hueteotl_run[c_hueteotl_run]
                     obj_hueteotl_weapon = list_hueteotl_weapon_run[c_hueteotl_run]
-
+                
                     if c_hueteotl_run >= ( len(list_hueteotl_run) - 1 ):
                         c_hueteotl_run = 0
-                    
                     else:
                         c_hueteotl_run += 1
 
@@ -183,21 +189,25 @@ def main():
                     if pos_box_2 <= -15:
                         pos_box_2 = 15
                     
-
             if event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
                 if event.key == pygame.K_w:             # Saltar
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("jump")
-
+                    sonido.startSount("jump")
+ 
                 if event.key == pygame.K_s:             # Agacharse
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("crouch")
-
+                    sonido.startSount("crouch")
+                
                 if event.key == pygame.K_d:             # Start
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("run")
+                    sonido.startSount("run")
+
                     eventos.startTimeEvents("box_1")    
+
 
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -374,5 +384,6 @@ def main():
     #glDeleteTextures([text])
     pygame.quit()
     quit()
+
 
 main()  
