@@ -15,6 +15,8 @@ from sound import *
 
 def main():
 
+    game_state = "Start"
+
     #--------------------------------------------------------------------------------------- 
 
     # Instrucciones para levantar ventana grafica
@@ -24,10 +26,9 @@ def main():
     height = 720
     display = (width,height)
     
-    window = pygame.display.set_mode(display, DOUBLEBUF|OPENGL|OPENGLBLIT)
+    gameDisplay  = pygame.display.set_mode(display, DOUBLEBUF|OPENGL|OPENGLBLIT)
     pygame.display.set_caption('Game Of Life')
-
-
+    clock = pygame.time.Clock()
 
     #---------------------------------------------------------------------------------------  
 
@@ -125,7 +126,7 @@ def main():
     eventos = events_obj()
 
     eventos.startTimeEvents("stand")    
-    sonido.startSount("stand")
+    sonido.startSound("stand")
 
     #---------------------------------------------------------------------------------------
 
@@ -136,6 +137,8 @@ def main():
     c_hueteotl_stand = 0 
 
     while True:
+
+        
         for event in pygame.event.get():        
 
             if event.type >= pygame.USEREVENT and event.type <= pygame.USEREVENT + 4:     # Evento Obj 
@@ -156,7 +159,8 @@ def main():
                     if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
                         c_hueteotl_jump = 0
                         eventos.stopTimeEvents("all")
-                        eventos.startTimeEvents("run")                    
+                        eventos.startTimeEvents("run")       
+                        sonido.stopSound("jump")             
                     else:
                         c_hueteotl_jump += 1
 
@@ -167,7 +171,8 @@ def main():
                     if c_hueteotl_crouch >= ( len(list_hueteotl_crouch) - 1 ):
                         c_hueteotl_crouch = 0
                         eventos.stopTimeEvents("all")
-                        eventos.startTimeEvents("run")                    
+                        eventos.startTimeEvents("run")    
+                        sonido.stopSound("crouch")                         
                     else:
                         c_hueteotl_crouch += 1
 
@@ -191,24 +196,43 @@ def main():
                     
             if event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
-                if event.key == pygame.K_w:             # Saltar
+                if event.key == pygame.K_w and game_state == "Playing":             # Saltar
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("jump")
-                    sonido.startSount("jump")
+                    sonido.startSound("jump")
  
-                if event.key == pygame.K_s:             # Agacharse
+                if event.key == pygame.K_s and game_state == "Playing":             # Agacharse
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("crouch")
-                    sonido.startSount("crouch")
+                    sonido.startSound("crouch")
                 
-                if event.key == pygame.K_d:             # Start
+                if event.key == pygame.K_d and game_state == "Start":             # Start
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("run")
-                    sonido.startSount("run")
+                    eventos.startTimeEvents("box_1")
+                    
+                    sonido.stopSound("all")
+                    sonido.startSound("run")
+                    game_state = "Playing"    
 
-                    eventos.startTimeEvents("box_1")    
-
-
+                if event.key == pygame.K_p and ( game_state == "Playing" or  game_state == "Pause"):           # Pause
+                    
+                    if  game_state != "Pause":  
+                        
+                        game_state = "Pause"
+                        sonido.stopSound("all")
+                        pygame.mixer.music.pause()
+                        eventos.stopTimeEvents("all")
+                        eventos.stopTimeEvents("box_1")
+                        
+                    else:
+                        
+                        game_state = "Playing"  
+                        pygame.mixer.music.unpause()
+                        eventos.startTimeEvents("run")
+                        eventos.startTimeEvents("box_1")
+                        sonido.startSound("run")
+                        
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
@@ -252,7 +276,8 @@ def main():
                 pygame.quit()
                 quit()
 
-    #---------------------------------------------------------------------------------------
+        
+     #---------------------------------------------------------------------------------------
     
         glMatrixMode(GL_MODELVIEW)                          # Activo el stack de matrices MODELVIEW.           
         glLoadIdentity()                                    # Limpio todas la transformaciones previas.
@@ -370,7 +395,7 @@ def main():
     
 
     #---------------------------------------------------------------------------------------
-    
+        
         # Luego de dibujar, desactivo todo.
 
         glBindTexture(GL_TEXTURE_2D, 0)                     
@@ -381,9 +406,9 @@ def main():
         
         pygame.display.flip()       # Hago flip de los buffers, para que se refresque la imagen en pantalla
 
+        
     #glDeleteTextures([text])
     pygame.quit()
     quit()
-
 
 main()  

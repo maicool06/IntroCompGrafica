@@ -1,35 +1,63 @@
-
 import pygame
+
+from pygame.locals import *
 
 class sound:
     
+    soundObj = None
+    
     def __init__(self):
+        pygame.mixer.pre_init(44100, 16, 2, 4096) #frequency, size, channels, buffersize
         pygame.mixer.init()      
 
-
-    def startSount(self, element):
-
-        #sonidoRecolección = pygame.mixer.Sound('recolección.wav')
+        self.hueteotl_run = pygame.mixer.Sound("./Music/hueteotl_run.ogg")
+        self.hueteotl_jump = pygame.mixer.Sound("./Music/hueteotl_jump.ogg")
+        self.hueteotl_crouch = pygame.mixer.Sound("./Music/hueteotl_crouch.ogg")
+        self.hueteotl_stand = pygame.mixer.Sound("./Music/hueteotl_stand.ogg")
+        
+    def startSound(self, element):
 
         if element == "run":
-            pygame.mixer.music.load("./Music/hueteotl_run.mp3")
+            self.hueteotl_run.play(-1)
+            self.hueteotl_run.set_volume(0.2)
+        
+        elif element == "jump":
+            self.hueteotl_jump.play
+        
+        elif element == "crouch":
+            self.hueteotl_crouch.play()
+
+        elif element == "stand":
+            self.hueteotl_stand.play(-1)
+        
+        elif element == "background":
+            pygame.mixer.music.load("./Music/background.mp3")
             pygame.mixer.music.play(-1, 0.0)
-            return
-        if element == "jump":
-            pygame.mixer.music.sound("./Music/hueteotl_jump.wav")
-            pygame.mixer.music.play(-1, 0.0)
-            return
-        if element == "crouch":
-            pygame.mixer.music.sound("./Music/hueteotl_crouch.wav")
-            pygame.mixer.music.play(-1, 0.0)
-            return
-        if element == "stand":
-            pygame.mixer.music.load("./Music/hueteotl_stand.mp3")
-            pygame.mixer.music.play(-1, 0.0)
-            return
+
         else:
             print("Default Start")
 
         
-        def stopSount(self):
+    def stopSound(self, element):
+        
+        if element == "run":
+            self.hueteotl_run.stop()
+    
+        elif element == "jump":
+            self.hueteotl_jump.stop()
+        
+        elif element == "crouch":
+            self.hueteotl_crouch.stop()
+
+        elif element == "stand":
+            self.hueteotl_crouch.stop()
+        
+        elif element == "background":
+            pygame.mixer.music.stop()
+
+        elif element == "all":
+            self.hueteotl_run.stop()
+            self.hueteotl_jump.stop()
+            self.hueteotl_crouch.stop()
+            self.hueteotl_stand.stop()
             pygame.mixer.music.stop()
