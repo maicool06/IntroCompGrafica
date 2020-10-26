@@ -130,7 +130,6 @@ def main():
 
     #---------------------------------------------------------------------------------------
 
-    
     c_hueteotl_run = 0
     c_hueteotl_jump = 0
     c_hueteotl_crouch = 0
@@ -138,7 +137,6 @@ def main():
 
     while True:
 
-        
         for event in pygame.event.get():        
 
             if event.type >= pygame.USEREVENT and event.type <= pygame.USEREVENT + 4:     # Evento Obj 
@@ -194,7 +192,7 @@ def main():
                     if pos_box_2 <= -15:
                         pos_box_2 = 15
                     
-            if event.type == pygame.KEYDOWN:    # Evento tecla presionada.
+            elif event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
                 if event.key == pygame.K_w and game_state == "Playing":             # Saltar
                     eventos.stopTimeEvents("all")
@@ -237,13 +235,6 @@ def main():
                     pygame.quit()
                     quit()
 
-                if event.key == pygame.K_l:     # Con la letra L prendo y apago la iluminacion
-                    light = not light
-                    if(light):
-                        glEnable(GL_LIGHTING)
-                    else:
-                        glDisable(GL_LIGHTING)
-
                 if event.key == pygame.K_m:     # Con la letra m, lo deja en formato malla o no (con o sin fondo).
                     if mode == GL_LINE:
                         mode = GL_FILL
@@ -272,7 +263,59 @@ def main():
                     else:
                         glFrontFace(GL_CCW)
 
-            if event.type == pygame.QUIT:       
+                if event.key == pygame.K_l:     # Con la letra L prendo y apago la iluminacion
+                    light = not light
+                    if(light):
+                        #glEnable(GL_LIGHTING)
+
+                        '''
+                         #hago push matrix para salvar el estado, y luego ingreso las transfromaciones para mover la luz
+                        #glPushMatrix()
+                        glRotatef(ang, 0,0,1)
+                        glTranslatef(10,15,0)
+
+
+                        #Dibujo un punto para mostrar donde está la fuente de luz
+                        glDisable(GL_LIGHTING)
+                        glBegin(GL_POINTS)
+                        glVertex3fv([10,15,0])
+                        glEnd()
+                        glEnable(GL_LIGHTING)
+
+                        #Al setear la posción de la luz, esta se multiplica por el contenido de la matrix MODELVIEW, haciendo que la fuente de luz se mueva
+                        glLightfv(GL_LIGHT4, GL_POSITION, [0,0,0,1])
+                        '''
+
+                        #glClearColor(0.,0.,0.,1.)
+                        glShadeModel(GL_SMOOTH)
+                        glEnable(GL_CULL_FACE)
+                        glEnable(GL_DEPTH_TEST)
+                        glEnable(GL_LIGHTING)
+                        lightZeroPosition = [10.,20.,10.,10.]
+                        #lightZeroColor = [0.8,1.0,0.8,1.0] #green tinged
+                        lightZeroColor = [1.0,0,0,1.0] #green tinged
+
+                        glEnable(GL_LIGHTING)   #Prueba
+                        glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
+                        glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat*4)(1,1,1,1))
+                        glEnable(GL_LIGHT0)
+
+
+                        glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition)
+                        glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor)
+                        glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1)
+                        glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.05)
+                        glEnable(GL_LIGHT0)
+
+
+                        #Vuelvo al estado anterior de la matriz, para dibujar el modelo
+                        #glPopMatrix()
+
+                    else:
+                        glDisable(GL_LIGHTING)
+                        glClearColor(0.1,0.6,0.8,0.5)               # Color de fondo.
+  
+            elif event.type == pygame.QUIT:       
                 pygame.quit()
                 quit()
 
@@ -313,8 +356,6 @@ def main():
         glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
 
         glPopMatrix()
-
-   #---------------------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------------------
 
@@ -393,9 +434,10 @@ def main():
 
         glPopMatrix()
     
-
-    #---------------------------------------------------------------------------------------
         
+    #---------------------------------------------------------------------------------------
+
+
         # Luego de dibujar, desactivo todo.
 
         glBindTexture(GL_TEXTURE_2D, 0)                     
