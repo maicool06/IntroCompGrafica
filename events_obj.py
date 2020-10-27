@@ -8,11 +8,11 @@ class events_obj():
         self.hueteotl_stand = pygame.USEREVENT + 3
         self.box_1 = pygame.USEREVENT + 4
 
-        self.v_hueteotl_run = 200
-        self.v_hueteotl_jump = 200
-        self.v_hueteotl_crouch = 200
-        self.v_hueteotl_stand = 200
-        self.v_box_1 = 100 
+        self.v_hueteotl_run = 250
+        self.v_hueteotl_jump = 300
+        self.v_hueteotl_crouch = 250
+        self.v_hueteotl_stand = 250
+        self.v_box_1 = 300 
 
     def startTimeEvents(self, element):
 

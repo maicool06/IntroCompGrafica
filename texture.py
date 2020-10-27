@@ -10,8 +10,8 @@ class texture:
     
     hueteotl = None
     hueteotl_weapon = None
-    box_1 = None
-    box_2 = None
+    box = None
+    fondo = None
 
     def __init__(self):
         
@@ -22,9 +22,9 @@ class texture:
         # Levanta las texturas a memoria de video            
         self.hueteotl = self.__loadTexture("./Animaciones/hueteotl_animado/hueteotl.png")
         self.hueteotl_weapon = self.__loadTexture("./Animaciones/weapon_hueteotl_animada/weapon.png")
-        self.box_1 = self.__loadTexture("./Animaciones/box/box.jpg")
-        self.box_2 = self.__loadTexture("./Animaciones/box/box.jpg")
-
+        self.box = self.__loadTexture("./Animaciones/box/box.jpg")
+        self.fondo = self.__loadTexture("./Animaciones/fondo/fondo.jpg")
+ 
     def __loadTexture(self,path):
 
         surf = pygame.image.load(path)                  # Cargo imagen en memoria
@@ -39,13 +39,6 @@ class texture:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         
-        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    
-        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-
-
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
         
         glBindTexture(GL_TEXTURE_2D, 0)

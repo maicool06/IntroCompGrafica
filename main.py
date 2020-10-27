@@ -22,11 +22,11 @@ def main():
     # Instrucciones para levantar ventana grafica
     
     pygame.init()
-    width = 1024
-    height = 720
-    display = (width,height)
+    width = 875
+    height = 654
+    display_wh = (width,height)
     
-    gameDisplay  = pygame.display.set_mode(display, DOUBLEBUF|OPENGL|OPENGLBLIT)
+    displayGame  = pygame.display.set_mode(display_wh, DOUBLEBUF|OPENGL|OPENGLBLIT)
     pygame.display.set_caption('Game Of Life')
     clock = pygame.time.Clock()
 
@@ -50,6 +50,8 @@ def main():
 
 
     list_box = obj().objLoad(0,"./Animaciones/box/","box_")  
+
+    list_fondo = obj().objLoad(0,"./Animaciones/fondo/","fondo_")  
    
     #---------------------------------------------------------------------------------------
 
@@ -100,13 +102,28 @@ def main():
 
     glEnable(GL_DEPTH_TEST)                         # Comparaciones de profundidad y actualizar el bufer de profundidad.
 
-   
+    #---------------------------------------------------------------------------------------
+ 
+    #Inicializar cosas de cositas para cosotes    
     
+    obj_hueteotl = list_hueteotl_stand[0]
+
+    obj_hueteotl_weapon = list_hueteotl_weapon_stand[0]
+
+    obj_box = list_box[0]
+
+    obj_fondo = list_fondo[0]
+
+    eventos = events_obj()
+
+    eventos.startTimeEvents("stand")    
+    sonido.startSound("stand")
+
     #---------------------------------------------------------------------------------------
 
+    
     # Variables
-    ang = 20
-    vel = 1
+
     pos_box_1 = 15
     pos_box_2 = 30
 
@@ -117,30 +134,13 @@ def main():
     light = False
     mute = False
 
-
-    #---------------------------------------------------------------------------------------
-    
-   
-    #Inicializar cosas de cositas para cosotes    
-    
-    obj_hueteotl = list_hueteotl_stand[0]
-
-    obj_hueteotl_weapon = list_hueteotl_weapon_stand[0]
-
-    obj_box = list_box[0]
-
-    eventos = events_obj()
-
-    eventos.startTimeEvents("stand")    
-    sonido.startSound("stand")
-
-    #---------------------------------------------------------------------------------------
-
     c_hueteotl_run = 0
     c_hueteotl_jump = 0
     c_hueteotl_crouch = 0
     c_hueteotl_stand = 0 
-
+    
+    #---------------------------------------------------------------------------------------
+   
     while True:
 
         for event in pygame.event.get():        
@@ -156,7 +156,7 @@ def main():
                     else:
                         c_hueteotl_run += 1
 
-                if event.type == eventos.hueteotl_jump:
+                elif event.type == eventos.hueteotl_jump:
                     obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
                     obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
 
@@ -168,7 +168,7 @@ def main():
                     else:
                         c_hueteotl_jump += 1
 
-                if event.type == eventos.hueteotl_crouch:
+                elif event.type == eventos.hueteotl_crouch:
                     obj_hueteotl = list_hueteotl_crouch[c_hueteotl_crouch]
                     obj_hueteotl_weapon = list_hueteotl_weapon_crouch[c_hueteotl_crouch]
 
@@ -180,7 +180,7 @@ def main():
                     else:
                         c_hueteotl_crouch += 1
 
-                if event.type == eventos.hueteotl_stand:
+                elif event.type == eventos.hueteotl_stand:
                     obj_hueteotl = list_hueteotl_stand[c_hueteotl_stand]
                     obj_hueteotl_weapon = list_hueteotl_weapon_stand[c_hueteotl_stand]
 
@@ -189,7 +189,7 @@ def main():
                     else:
                         c_hueteotl_stand += 1
 
-                if event.type == eventos.box_1:
+                elif event.type == eventos.box_1:
                     pos_box_1 -= 1
                     pos_box_2 -= 1
 
@@ -205,12 +205,12 @@ def main():
                     eventos.startTimeEvents("jump")
                     sonido.startSound("jump")
  
-                if event.key == pygame.K_s and game_state == "Playing":             # Agacharse
+                elif event.key == pygame.K_s and game_state == "Playing":             # Agacharse
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("crouch")
                     sonido.startSound("crouch")
                 
-                if event.key == pygame.K_d and game_state == "Start":             # Start
+                elif event.key == pygame.K_d and game_state == "Start":             # Start
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("run")
                     eventos.startTimeEvents("box_1")
@@ -219,7 +219,7 @@ def main():
                     sonido.startSound("run")
                     game_state = "Playing"    
 
-                if event.key == pygame.K_p and ( game_state == "Playing" or  game_state == "Pause"):           # Pause
+                elif event.key == pygame.K_p and ( game_state == "Playing" or  game_state == "Pause"):           # Pause
                     
                     if  game_state != "Pause":  
                         
@@ -237,7 +237,7 @@ def main():
                         eventos.startTimeEvents("box_1")
                         sonido.startSound("run")
 
-                if event.key == pygame.K_o:     # Con la letra o, muteo y desmuteo.
+                elif event.key == pygame.K_o:     # Con la letra o, muteo y desmuteo.
 
                     mute = not mute
                     
@@ -254,46 +254,43 @@ def main():
                         
                         pygame.mixer.music.unpause()
 
-                if event.key == pygame.K_ESCAPE:
+                elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
 
-                if event.key == pygame.K_m:     # Con la letra m, lo deja en formato malla o no (con o sin fondo).
+                elif event.key == pygame.K_m:     # Con la letra m, lo deja en formato malla o no (con o sin fondo).
                     if mode == GL_LINE:
                         mode = GL_FILL
                     else:
                         mode = GL_LINE
                     glPolygonMode( GL_FRONT_AND_BACK, mode)
 
-                if event.key == pygame.K_z:     # Con la letra z, activa el z-buffer
+                elif event.key == pygame.K_z:     # Con la letra z, activa el z-buffer
                     zBuffer = not zBuffer
                     if(zBuffer):
                         glEnable(GL_DEPTH_TEST)
                     else:
                         glDisable(GL_DEPTH_TEST)
 
-                if event.key == pygame.K_b:     # Con la letra b, activo cullface
+                elif event.key == pygame.K_b:     # Con la letra b, activo cullface
                     bfc = not bfc
                     if(bfc):
                         glEnable(GL_CULL_FACE)
                     else:
                         glDisable(GL_CULL_FACE)
 
-                if event.key == pygame.K_c:     # Con la letra c
+                elif event.key == pygame.K_c:     # Con la letra c
                     bfcCW = not bfcCW
                     if(bfcCW):
                         glFrontFace(GL_CW)
                     else:
                         glFrontFace(GL_CCW)
 
-                if event.key == pygame.K_l:     # Con la letra L prendo y apago la iluminacion
+                elif event.key == pygame.K_l:     # Con la letra L prendo y apago la iluminacion
                     light = not light
                     if(light):
                         glEnable(GL_LIGHTING)
-
                         glClearColor(0.,0.,0.,1.)   # Black
-
-                        
 
                     else:
                         glDisable(GL_LIGHTING)
@@ -302,9 +299,8 @@ def main():
             elif event.type == pygame.QUIT:       
                 pygame.quit()
                 quit()
-        
      #---------------------------------------------------------------------------------------
-    
+   
         glMatrixMode(GL_MODELVIEW)                          # Activo el stack de matrices MODELVIEW.           
         glLoadIdentity()                                    # Limpio todas la transformaciones previas.
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)    # Limpio el buffer de colores y el ZBuffer donde voy a dibujar.
@@ -317,49 +313,55 @@ def main():
 
 
     #---------------------------------------------------------------------------------------
-
-        #  BOX 1
+        #  Fondo
 
         glPushMatrix()
-   
-        glTranslatef(pos_box_1, -5, -15)  # Traslacion. (derecha, arriba, profundida).
-        glScalef(0.5,0.5,0.5)
-      
-        glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-    
-        #glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
 
-        #glRotatef(230, 0,0,1)
+        glTranslatef(0, 0, -20)  # Traslacion. (derecha, arriba, profundida).
+        escala = 20.5
+        glScalef(escala,escala,escala)
 
-        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+        glVertexPointer(3, GL_FLOAT, 0, obj_fondo.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_fondo.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_fondo.texturesFaces)
 
-        glBindTexture(GL_TEXTURE_2D, textura.box_1)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+        glBindTexture(GL_TEXTURE_2D, textura.fondo)
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_fondo.vertFaces)*3)  
 
         glPopMatrix()
 
     #---------------------------------------------------------------------------------------
-
-        #  BOX 2
+        #  BOX Down
 
         glPushMatrix()
    
-        glTranslatef(pos_box_2, 5, -15)  # Traslacion. (derecha, arriba, profundida).
-        glScalef(0.5,0.5,0.5)
-      
-        glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-    
-        #glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-
+        glTranslatef(pos_box_1, -6, -10)  # Traslacion. (derecha, arriba, profundida).
         #glRotatef(230, 0,0,1)
-
+        glScalef(1.0,1.0,1.0)
+      
         glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
         glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
         glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
 
-        glBindTexture(GL_TEXTURE_2D, textura.box_2)                  
+        glBindTexture(GL_TEXTURE_2D, textura.box)                  
+        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+
+        glPopMatrix()
+    
+    #---------------------------------------------------------------------------------------
+        #  BOX Up
+
+        glPushMatrix()
+   
+        glTranslatef(pos_box_2, 1, -10)  # Traslacion. (derecha, arriba, profundida).
+        #glRotatef(230, 0,0,1)
+        glScalef(1.6,1.6,1.6)
+      
+        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
+        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
+        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+
+        glBindTexture(GL_TEXTURE_2D, textura.box)                  
         glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
 
         glPopMatrix()
@@ -370,7 +372,7 @@ def main():
 
         glPushMatrix()
    
-        glTranslatef(0, 0, -2)  # Traslacion. (derecha, arriba, profundida).
+        glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
         #glScalef(0.02,0.02,0.02)
         glScalef(0.03,0.03,0.03)
         
@@ -397,7 +399,7 @@ def main():
 
         glPushMatrix()
    
-        glTranslatef(0, 0, -2)  # Traslacion. (derecha, arriba, profundida).
+        glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
         glScalef(0.02,0.02,0.02)
         
         #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
