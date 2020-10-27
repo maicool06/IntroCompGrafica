@@ -15,6 +15,10 @@ class texture:
 
     def __init__(self):
         
+         # Activo las texturas ( 8 disponibles).
+        glEnable(GL_TEXTURE_2D)                         
+        glActiveTexture(GL_TEXTURE0)       
+        
         # Levanta las texturas a memoria de video            
         self.hueteotl = self.__loadTexture("./Animaciones/hueteotl_animado/hueteotl.png")
         self.hueteotl_weapon = self.__loadTexture("./Animaciones/weapon_hueteotl_animada/weapon.png")

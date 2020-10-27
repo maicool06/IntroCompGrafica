@@ -30,6 +30,8 @@ def main():
     pygame.display.set_caption('Game Of Life')
     clock = pygame.time.Clock()
 
+    glClearColor(0.1,0.6,0.8,0.5)               # Color de fondo.
+
     #---------------------------------------------------------------------------------------  
 
     # Cargar archivos .obj.
@@ -50,11 +52,6 @@ def main():
     list_box = obj().objLoad(0,"./Animaciones/box/","box_")  
    
     #---------------------------------------------------------------------------------------
-
-    # Activo las texturas ( 8 disponibles).
-
-    glEnable(GL_TEXTURE_2D)                         
-    glActiveTexture(GL_TEXTURE0)       
 
     # Cargar texturas.
     
@@ -78,12 +75,21 @@ def main():
 
 
     # Activo las luces ( 0 a 7 )
+ 
+    lightZeroPosition = [10.,20.,10.,10.]
+    lightZeroColor = [1.0,0,0,1.0]  # Red
 
-    glEnable(GL_LIGHT0)   
-    glLight(GL_LIGHT0, GL_DIFFUSE, [1.0,0.0,0.0,1])      
-    glLight(GL_LIGHT0, GL_AMBIENT, [1,1,1,1])       
-    glLight(GL_LIGHT0, GL_POSITION, [0,100,-50,0])      # [0,0,0,1] es luz puntual, [0,0,0,0] es luz direccional
-    glLight(GL_LIGHT0, GL_SPECULAR, [1,0,0,1])
+    glEnable(GL_LIGHT0)
+    
+    glShadeModel(GL_SMOOTH)
+    glEnable(GL_CULL_FACE)
+    glEnable(GL_DEPTH_TEST)
+  
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor)
+    glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition)
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.2)
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.05)
+   
 
     #---------------------------------------------------------------------------------------
 
@@ -94,8 +100,7 @@ def main():
 
     glEnable(GL_DEPTH_TEST)                         # Comparaciones de profundidad y actualizar el bufer de profundidad.
 
-    glClearColor(0.1,0.6,0.8,0.5)               # Color de fondo.
-
+   
     
     #---------------------------------------------------------------------------------------
 
@@ -110,6 +115,7 @@ def main():
     bfc = False
     bfcCW = True
     light = False
+    mute = False
 
 
     #---------------------------------------------------------------------------------------
@@ -230,7 +236,24 @@ def main():
                         eventos.startTimeEvents("run")
                         eventos.startTimeEvents("box_1")
                         sonido.startSound("run")
+
+                if event.key == pygame.K_o:     # Con la letra o, muteo y desmuteo.
+
+                    mute = not mute
+                    
+                    if mute:
+                        sonido.stopSound("all")
+                        pygame.mixer.music.pause()
+
+                    else:
+                        if game_state == "Playing":
+                            sonido.startSound("run")   
                         
+                        if game_state == "Start":
+                            sonido.startSound("stand")  
+                        
+                        pygame.mixer.music.unpause()
+
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
@@ -266,50 +289,11 @@ def main():
                 if event.key == pygame.K_l:     # Con la letra L prendo y apago la iluminacion
                     light = not light
                     if(light):
-                        #glEnable(GL_LIGHTING)
-
-                        '''
-                         #hago push matrix para salvar el estado, y luego ingreso las transfromaciones para mover la luz
-                        #glPushMatrix()
-                        glRotatef(ang, 0,0,1)
-                        glTranslatef(10,15,0)
-
-
-                        #Dibujo un punto para mostrar donde está la fuente de luz
-                        glDisable(GL_LIGHTING)
-                        glBegin(GL_POINTS)
-                        glVertex3fv([10,15,0])
-                        glEnd()
                         glEnable(GL_LIGHTING)
 
-                        #Al setear la posción de la luz, esta se multiplica por el contenido de la matrix MODELVIEW, haciendo que la fuente de luz se mueva
-                        glLightfv(GL_LIGHT4, GL_POSITION, [0,0,0,1])
-                        '''
+                        glClearColor(0.,0.,0.,1.)   # Black
 
-                        #glClearColor(0.,0.,0.,1.)
-                        glShadeModel(GL_SMOOTH)
-                        glEnable(GL_CULL_FACE)
-                        glEnable(GL_DEPTH_TEST)
-                        glEnable(GL_LIGHTING)
-                        lightZeroPosition = [10.,20.,10.,10.]
-                        #lightZeroColor = [0.8,1.0,0.8,1.0] #green tinged
-                        lightZeroColor = [1.0,0,0,1.0] #green tinged
-
-                        glEnable(GL_LIGHTING)   #Prueba
-                        glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
-                        glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat*4)(1,1,1,1))
-                        glEnable(GL_LIGHT0)
-
-
-                        glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition)
-                        glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor)
-                        glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1)
-                        glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.05)
-                        glEnable(GL_LIGHT0)
-
-
-                        #Vuelvo al estado anterior de la matriz, para dibujar el modelo
-                        #glPopMatrix()
+                        
 
                     else:
                         glDisable(GL_LIGHTING)
@@ -318,13 +302,12 @@ def main():
             elif event.type == pygame.QUIT:       
                 pygame.quit()
                 quit()
-
         
      #---------------------------------------------------------------------------------------
     
         glMatrixMode(GL_MODELVIEW)                          # Activo el stack de matrices MODELVIEW.           
         glLoadIdentity()                                    # Limpio todas la transformaciones previas.
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)    # Limpio el buffer de colores donde voy a dibujar.
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)    # Limpio el buffer de colores y el ZBuffer donde voy a dibujar.
         
         # Habilito arrays.
 

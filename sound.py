@@ -60,4 +60,4 @@ class sound:
             self.hueteotl_jump.stop()
             self.hueteotl_crouch.stop()
             self.hueteotl_stand.stop()
-            pygame.mixer.music.stop()
+            #pygame.mixer.music.stop()
