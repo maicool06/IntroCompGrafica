@@ -50,7 +50,7 @@ class sound:
             self.hueteotl_crouch.stop()
 
         elif element == "stand":
-            self.hueteotl_crouch.stop()
+            self.hueteotl_stand.stop()
         
         elif element == "background":
             pygame.mixer.music.stop()
