@@ -12,7 +12,7 @@ class events_obj():
         self.v_hueteotl_jump = 300
         self.v_hueteotl_crouch = 250
         self.v_hueteotl_stand = 250
-        self.v_box_1 = 300 
+        self.v_box_1 = 150 
 
     def startTimeEvents(self, element):
 

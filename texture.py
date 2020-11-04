@@ -11,7 +11,8 @@ class texture:
     hueteotl = None
     hueteotl_weapon = None
     box = None
-    fondo = None
+    fondo_caverna = None
+    fondo_game_over = None
 
     def __init__(self):
         
@@ -23,7 +24,8 @@ class texture:
         self.hueteotl = self.__loadTexture("./Animaciones/hueteotl_animado/hueteotl.png")
         self.hueteotl_weapon = self.__loadTexture("./Animaciones/weapon_hueteotl_animada/weapon.png")
         self.box = self.__loadTexture("./Animaciones/box/box.jpg")
-        self.fondo = self.__loadTexture("./Animaciones/fondo/fondo.jpg")
+        self.fondo_caverna = self.__loadTexture("./Animaciones/fondo/fondo_pasto.jpg")
+        self.fondo_game_over = self.__loadTexture("./Animaciones/fondo/fondo_game_over.jpg")
  
     def __loadTexture(self,path):
 

@@ -15,10 +15,6 @@ from sound import *
 
 def main():
 
-    game_state = "Start"
-
-    #--------------------------------------------------------------------------------------- 
-
     # Instrucciones para levantar ventana grafica
     
     pygame.init()
@@ -48,11 +44,13 @@ def main():
     list_hueteotl_stand= obj().objLoad(39,"./Animaciones/hueteotl_animado/","hueteotl_stand_")  
     list_hueteotl_weapon_stand = obj().objLoad(39,"./Animaciones/weapon_hueteotl_animada/","weapon_stand_")
 
-
     list_box = obj().objLoad(0,"./Animaciones/box/","box_")  
 
-    list_fondo = obj().objLoad(0,"./Animaciones/fondo/","fondo_")  
+    list_fondo_caverna = obj().objLoad(0,"./Animaciones/fondo/","fondo_")  
    
+    list_fondo_game_over = obj().objLoad(0,"./Animaciones/fondo/","fondo_")  
+
+    list_fondo = obj().objLoad(0,"./Animaciones/fondo/","fondo_")  
     #---------------------------------------------------------------------------------------
 
     # Cargar texturas.
@@ -112,7 +110,9 @@ def main():
 
     obj_box = list_box[0]
 
-    obj_fondo = list_fondo[0]
+    obj_fondo_caverna = list_fondo_caverna[0]
+
+    obj_fondo_game_over = list_fondo_game_over[0]
 
     eventos = events_obj()
 
@@ -138,6 +138,8 @@ def main():
     c_hueteotl_jump = 0
     c_hueteotl_crouch = 0
     c_hueteotl_stand = 0 
+
+    game_state = "Start"
     
     #---------------------------------------------------------------------------------------
    
@@ -159,24 +161,28 @@ def main():
                 elif event.type == eventos.hueteotl_jump:
                     obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
                     obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
+                    game_state = "Jump"
 
                     if c_hueteotl_jump >= ( len(list_hueteotl_jump) - 1 ):
                         c_hueteotl_jump = 0
                         eventos.stopTimeEvents("all")
                         eventos.startTimeEvents("run")       
-                        sonido.stopSound("jump")             
+                        sonido.stopSound("jump")
+                        game_state = "Playing"             
                     else:
                         c_hueteotl_jump += 1
 
                 elif event.type == eventos.hueteotl_crouch:
                     obj_hueteotl = list_hueteotl_crouch[c_hueteotl_crouch]
                     obj_hueteotl_weapon = list_hueteotl_weapon_crouch[c_hueteotl_crouch]
+                    game_state = "Crouch"
 
                     if c_hueteotl_crouch >= ( len(list_hueteotl_crouch) - 1 ):
                         c_hueteotl_crouch = 0
                         eventos.stopTimeEvents("all")
                         eventos.startTimeEvents("run")    
-                        sonido.stopSound("crouch")                         
+                        sonido.stopSound("crouch")
+                        game_state = "Playing"                         
                     else:
                         c_hueteotl_crouch += 1
 
@@ -186,17 +192,18 @@ def main():
 
                     if c_hueteotl_stand >= ( len(list_hueteotl_stand) - 1 ):
                         c_hueteotl_stand = 0
+                        game_state = "Playing"
                     else:
                         c_hueteotl_stand += 1
 
                 elif event.type == eventos.box_1:
-                    pos_box_1 -= 1
-                    pos_box_2 -= 1
+                    pos_box_1 -= 0.5
+                    pos_box_2 -= 0.5
 
                     if pos_box_1 <= -15:
                         pos_box_1 = 15
                     if pos_box_2 <= -15:
-                        pos_box_2 = 15
+                        pos_box_2 = 30
                     
             elif event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
@@ -219,7 +226,7 @@ def main():
                     sonido.startSound("run")
                     game_state = "Playing"    
 
-                elif event.key == pygame.K_p and ( game_state == "Playing" or  game_state == "Pause"):           # Pause
+                elif event.key == pygame.K_p and game_state != "Start" and game_state != "Over":           # Pause
                     
                     if  game_state != "Pause":  
                         
@@ -299,8 +306,9 @@ def main():
             elif event.type == pygame.QUIT:       
                 pygame.quit()
                 quit()
-     #---------------------------------------------------------------------------------------
-   
+      
+        #---------------------------------------------------------------------------------------
+
         glMatrixMode(GL_MODELVIEW)                          # Activo el stack de matrices MODELVIEW.           
         glLoadIdentity()                                    # Limpio todas la transformaciones previas.
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)    # Limpio el buffer de colores y el ZBuffer donde voy a dibujar.
@@ -312,116 +320,162 @@ def main():
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)        
 
 
-    #---------------------------------------------------------------------------------------
-        #  Fondo
+        print(str(pos_box_2))
+        
+        if  ( (-7 < pos_box_1) and (pos_box_1 < -3)  and game_state != "Jump" ) or ( (-7 < pos_box_2 ) and (pos_box_2 < -3) and game_state != "Crouch" ):
+            #''' 
+            sonido.stopSound("all")
+            eventos.stopTimeEvents("all")
+            eventos.stopTimeEvents("box_1")
 
-        glPushMatrix()
+            #---------------------------------------------------------------------------------------
 
-        glTranslatef(0, 0, -20)  # Traslacion. (derecha, arriba, profundida).
-        escala = 20.5
-        glScalef(escala,escala,escala)
+            #  Fondo game_over
 
-        glVertexPointer(3, GL_FLOAT, 0, obj_fondo.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_fondo.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_fondo.texturesFaces)
+            glPushMatrix()
 
-        glBindTexture(GL_TEXTURE_2D, textura.fondo)
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_fondo.vertFaces)*3)  
+            glTranslatef(0, 0, -20)  # Traslacion. (derecha, arriba, profundida).
+            escala = 20.5
+            glScalef(escala,escala,escala)
 
-        glPopMatrix()
+            glVertexPointer(3, GL_FLOAT, 0, obj_fondo_game_over.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_fondo_game_over.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_fondo_game_over.texturesFaces)
 
-    #---------------------------------------------------------------------------------------
-        #  BOX Down
+            glBindTexture(GL_TEXTURE_2D, textura.fondo_game_over)
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_fondo_game_over.vertFaces)*3)  
 
-        glPushMatrix()
-   
-        glTranslatef(pos_box_1, -6, -10)  # Traslacion. (derecha, arriba, profundida).
-        #glRotatef(230, 0,0,1)
-        glScalef(1.0,1.0,1.0)
-      
-        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+            glPopMatrix()
 
-        glBindTexture(GL_TEXTURE_2D, textura.box)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+            pygame.display.flip()       # Hago flip de los buffers, para que se refresque la imagen en pantalla
 
-        glPopMatrix()
+            pygame.time.wait(3000)
+
+
+            pos_box_1 = 15
+            pos_box_2 = 30
+
+            c_hueteotl_run = 0
+            c_hueteotl_jump = 0
+            c_hueteotl_crouch = 0
+            c_hueteotl_stand = 0 
+
+            game_state = "Start"
+            eventos.startTimeEvents("stand")    
+            sonido.startSound("stand")
+
+        else:
+
+            #  Fondo caverna
+
+            glPushMatrix()
+
+            glTranslatef(0, 0, -20)  # Traslacion. (derecha, arriba, profundida).
+            escala = 20.5
+            glScalef(escala,escala,escala)
+
+            glVertexPointer(3, GL_FLOAT, 0, obj_fondo_caverna.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_fondo_caverna.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_fondo_caverna.texturesFaces)
+
+            glBindTexture(GL_TEXTURE_2D, textura.fondo_caverna)
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_fondo_caverna.vertFaces)*3)  
+
+            glPopMatrix()
+
+            #---------------------------------------------------------------------------------------
+            
+            #  BOX Down
+
+            glPushMatrix()
     
-    #---------------------------------------------------------------------------------------
-        #  BOX Up
-
-        glPushMatrix()
-   
-        glTranslatef(pos_box_2, 1, -10)  # Traslacion. (derecha, arriba, profundida).
-        #glRotatef(230, 0,0,1)
-        glScalef(1.6,1.6,1.6)
-      
-        glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
-
-        glBindTexture(GL_TEXTURE_2D, textura.box)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
-
-        glPopMatrix()
-
-   #---------------------------------------------------------------------------------------
-
-        #   HUETEOTL
-
-        glPushMatrix()
-   
-        glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
-        #glScalef(0.02,0.02,0.02)
-        glScalef(0.03,0.03,0.03)
+            glTranslatef(pos_box_1, -5, -10)  # Traslacion. (derecha, arriba, profundida).
+            #glRotatef(230, 0,0,1)
+            glScalef(1.0,1.0,1.0)
         
-        #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+            glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+
+            glBindTexture(GL_TEXTURE_2D, textura.box)                  
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+
+            glPopMatrix()
         
-        #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+            #---------------------------------------------------------------------------------------
+            
+            #  BOX Up
+
+            glPushMatrix()
     
-        glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-
-        #glRotatef(230, 0,0,1)
-
-        glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_hueteotl.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl.texturesFaces)
-
-        glBindTexture(GL_TEXTURE_2D, textura.hueteotl)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl.vertFaces)*3)     
-
-        glPopMatrix()
-
-    #---------------------------------------------------------------------------------------
- 
-        #   HUETEOTL WEAPON
-
-        glPushMatrix()
-   
-        glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
-        glScalef(0.02,0.02,0.02)
+            glTranslatef(pos_box_2, 2, -10)  # Traslacion. (derecha, arriba, profundida).
+            #glRotatef(230, 0,0,1)
+            glScalef(1.6,1.6,1.6)
         
-        #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
-        
-        #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+            glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_box.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_box.texturesFaces)
+
+            glBindTexture(GL_TEXTURE_2D, textura.box)                  
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_box.vertFaces)*3)     
+
+            glPopMatrix()
+
+            #---------------------------------------------------------------------------------------
+
+            #   HUETEOTL
+
+            glPushMatrix()
     
-        glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-
-        #glRotatef(230, 0,0,1)
-
-        glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl_weapon.vertFaces)         
-        glNormalPointer(GL_FLOAT, 0, obj_hueteotl_weapon.normalFaces)           
-        glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl_weapon.texturesFaces)
-
-        glBindTexture(GL_TEXTURE_2D, textura.hueteotl_weapon)                  
-        glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl_weapon.vertFaces)*3)     
-
-        glPopMatrix()
-    
+#            glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
+            glTranslatef(-1, -0.4, -2)  # Traslacion. (derecha, arriba, profundida).
+            #glScalef(0.02,0.02,0.02)
+            glScalef(0.03,0.03,0.03)
+            
+            #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+            
+            #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
         
-    #---------------------------------------------------------------------------------------
+            glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
 
+            #glRotatef(230, 0,0,1)
+
+            glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_hueteotl.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl.texturesFaces)
+
+            glBindTexture(GL_TEXTURE_2D, textura.hueteotl)                  
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl.vertFaces)*3)     
+
+            glPopMatrix()
+
+            #---------------------------------------------------------------------------------------
+    
+            #   HUETEOTL WEAPON
+
+            glPushMatrix()
+    
+            glTranslatef(-1, -0.4, -2)  # Traslacion. (derecha, arriba, profundida).
+            glScalef(0.02,0.02,0.02)
+            
+            #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
+            
+            #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+        
+            glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
+
+            #glRotatef(230, 0,0,1)
+
+            glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl_weapon.vertFaces)         
+            glNormalPointer(GL_FLOAT, 0, obj_hueteotl_weapon.normalFaces)           
+            glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl_weapon.texturesFaces)
+
+            glBindTexture(GL_TEXTURE_2D, textura.hueteotl_weapon)                  
+            glDrawArrays(GL_TRIANGLES, 0, len(obj_hueteotl_weapon.vertFaces)*3)     
+
+            glPopMatrix()
+        
+            #---------------------------------------------------------------------------------------
 
         # Luego de dibujar, desactivo todo.
 
@@ -432,7 +486,6 @@ def main():
         glDisableClientState(GL_TEXTURE_COORD_ARRAY)
         
         pygame.display.flip()       # Hago flip de los buffers, para que se refresque la imagen en pantalla
-
         
     #glDeleteTextures([text])
     pygame.quit()
