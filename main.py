@@ -318,12 +318,8 @@ def main():
         glEnableClientState(GL_VERTEX_ARRAY)                
         glEnableClientState(GL_NORMAL_ARRAY)               
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)        
-
-
-        print(str(pos_box_2))
         
         if  ( (-7 < pos_box_1) and (pos_box_1 < -3)  and game_state != "Jump" ) or ( (-7 < pos_box_2 ) and (pos_box_2 < -3) and game_state != "Crouch" ):
-            #''' 
             sonido.stopSound("all")
             eventos.stopTimeEvents("all")
             eventos.stopTimeEvents("box_1")

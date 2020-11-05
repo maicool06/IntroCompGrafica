@@ -22,7 +22,7 @@ class sound:
             self.hueteotl_run.set_volume(0.2)
         
         elif element == "jump":
-            self.hueteotl_jump.play
+            self.hueteotl_jump.play()
         
         elif element == "crouch":
             self.hueteotl_crouch.play()
