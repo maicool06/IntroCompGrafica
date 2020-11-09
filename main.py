@@ -140,6 +140,7 @@ def main():
     c_hueteotl_stand = 0 
 
     game_state = "Start"
+    before_game_state = None
     
     #---------------------------------------------------------------------------------------
    
@@ -149,7 +150,7 @@ def main():
 
             if event.type >= pygame.USEREVENT and event.type <= pygame.USEREVENT + 4:     # Evento Obj 
 
-                if event.type == eventos.hueteotl_run:
+                if event.type == eventos.hueteotl_run:                                      # Run
                     obj_hueteotl = list_hueteotl_run[c_hueteotl_run]
                     obj_hueteotl_weapon = list_hueteotl_weapon_run[c_hueteotl_run]
                 
@@ -158,7 +159,7 @@ def main():
                     else:
                         c_hueteotl_run += 1
 
-                elif event.type == eventos.hueteotl_jump:
+                elif event.type == eventos.hueteotl_jump:                                   # Jump
                     obj_hueteotl = list_hueteotl_jump[c_hueteotl_jump]
                     obj_hueteotl_weapon = list_hueteotl_weapon_jump[c_hueteotl_jump]
                     game_state = "Jump"
@@ -168,11 +169,11 @@ def main():
                         eventos.stopTimeEvents("all")
                         eventos.startTimeEvents("run")       
                         sonido.stopSound("jump")
-                        game_state = "Playing"             
+                        game_state = "Playing"     
                     else:
                         c_hueteotl_jump += 1
 
-                elif event.type == eventos.hueteotl_crouch:
+                elif event.type == eventos.hueteotl_crouch:                                 # Crouch
                     obj_hueteotl = list_hueteotl_crouch[c_hueteotl_crouch]
                     obj_hueteotl_weapon = list_hueteotl_weapon_crouch[c_hueteotl_crouch]
                     game_state = "Crouch"
@@ -186,13 +187,12 @@ def main():
                     else:
                         c_hueteotl_crouch += 1
 
-                elif event.type == eventos.hueteotl_stand:
+                elif event.type == eventos.hueteotl_stand:                                  # Stand
                     obj_hueteotl = list_hueteotl_stand[c_hueteotl_stand]
                     obj_hueteotl_weapon = list_hueteotl_weapon_stand[c_hueteotl_stand]
 
                     if c_hueteotl_stand >= ( len(list_hueteotl_stand) - 1 ):
                         c_hueteotl_stand = 0
-                        game_state = "Playing"
                     else:
                         c_hueteotl_stand += 1
 
@@ -207,17 +207,17 @@ def main():
                     
             elif event.type == pygame.KEYDOWN:    # Evento tecla presionada.
 
-                if event.key == pygame.K_w and game_state == "Playing":             # Saltar
+                if event.key == pygame.K_w and game_state == "Playing":                                 # Saltar    -   W
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("jump")
                     sonido.startSound("jump")
- 
-                elif event.key == pygame.K_s and game_state == "Playing":             # Agacharse
+
+                elif event.key == pygame.K_s and game_state == "Playing":                               # Agacharse  -  S
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("crouch")
                     sonido.startSound("crouch")
-                
-                elif event.key == pygame.K_d and game_state == "Start":             # Start
+
+                elif event.key == pygame.K_d and game_state == "Start":                                 # Start     -   D
                     eventos.stopTimeEvents("all")
                     eventos.startTimeEvents("run")
                     eventos.startTimeEvents("box_1")
@@ -226,10 +226,11 @@ def main():
                     sonido.startSound("run")
                     game_state = "Playing"    
 
-                elif event.key == pygame.K_p and game_state != "Start" and game_state != "Over":           # Pause
+                elif event.key == pygame.K_p and game_state != "Start" and game_state != "Over":        # Pause     -   P
                     
                     if  game_state != "Pause":  
                         
+                        before_game_state = game_state
                         game_state = "Pause"
                         sonido.stopSound("all")
                         pygame.mixer.music.pause()
@@ -237,14 +238,24 @@ def main():
                         eventos.stopTimeEvents("box_1")
                         
                     else:
-                        
-                        game_state = "Playing"  
-                        pygame.mixer.music.unpause()
-                        eventos.startTimeEvents("run")
-                        eventos.startTimeEvents("box_1")
-                        sonido.startSound("run")
+                        game_state = before_game_state  
 
-                elif event.key == pygame.K_o:     # Con la letra o, muteo y desmuteo.
+                        pygame.event.clear()
+                        pygame.mixer.music.unpause()
+                        eventos.startTimeEvents("box_1")
+                        
+                        if game_state == "Jump":
+                             pygame.event.post(pygame.event.Event( eventos.hueteotl_jump ) )
+                             eventos.startTimeEvents("jump")
+                        elif game_state == "Crouch":
+                             pygame.event.post(pygame.event.Event( eventos.hueteotl_crouch ) )
+                             eventos.startTimeEvents("crouch")
+                        else: 
+                             pygame.event.post(pygame.event.Event( eventos.hueteotl_run ) )
+                             eventos.startTimeEvents("run")
+
+                        
+                elif event.key == pygame.K_o:                                               # Muteo y desmuteo        -   O
 
                     mute = not mute
                     
@@ -386,7 +397,6 @@ def main():
             glPushMatrix()
     
             glTranslatef(pos_box_1, -5, -10)  # Traslacion. (derecha, arriba, profundida).
-            #glRotatef(230, 0,0,1)
             glScalef(1.0,1.0,1.0)
         
             glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
@@ -405,7 +415,6 @@ def main():
             glPushMatrix()
     
             glTranslatef(pos_box_2, 2, -10)  # Traslacion. (derecha, arriba, profundida).
-            #glRotatef(230, 0,0,1)
             glScalef(1.6,1.6,1.6)
         
             glVertexPointer(3, GL_FLOAT, 0, obj_box.vertFaces)         
@@ -420,21 +429,11 @@ def main():
             #---------------------------------------------------------------------------------------
 
             #   HUETEOTL
-
+            
             glPushMatrix()
-    
-#            glTranslatef(-1, -0.6, -2)  # Traslacion. (derecha, arriba, profundida).
             glTranslatef(-1, -0.4, -2)  # Traslacion. (derecha, arriba, profundida).
-            #glScalef(0.02,0.02,0.02)
             glScalef(0.03,0.03,0.03)
-            
-            #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
-            
-            #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-        
             glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-
-            #glRotatef(230, 0,0,1)
 
             glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl.vertFaces)         
             glNormalPointer(GL_FLOAT, 0, obj_hueteotl.normalFaces)           
@@ -453,15 +452,8 @@ def main():
     
             glTranslatef(-1, -0.4, -2)  # Traslacion. (derecha, arriba, profundida).
             glScalef(0.02,0.02,0.02)
-            
-            #glTranslatef(-20,-10,-80) # Traslacion. (derecha, arriba, profundida).
-            
-            #glRotatef(0, 0, 0, 0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-        
             glRotatef(270, 180,0,0)   # Rotacion.  (angulo, eje x, eje y, eje z).
-
-            #glRotatef(230, 0,0,1)
-
+            
             glVertexPointer(3, GL_FLOAT, 0, obj_hueteotl_weapon.vertFaces)         
             glNormalPointer(GL_FLOAT, 0, obj_hueteotl_weapon.normalFaces)           
             glTexCoordPointer(2, GL_FLOAT, 0, obj_hueteotl_weapon.texturesFaces)
